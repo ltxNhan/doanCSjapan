@@ -1,0 +1,145 @@
+﻿@model List<JapanApp.Models.Festival>
+
+@{
+    ViewData["Title"] = "Bản đồ";
+}
+
+<div class="tool-page">
+    <div class="tool-hero">
+        <span class="tool-badge">🗺️ OpenStreetMap API</span>
+        <h1>Bản đồ lễ hội Nhật Bản</h1>
+        <p>Hiển thị vị trí tất cả lễ hội trên bản đồ Nhật Bản bằng Leaflet.js và OpenStreetMap.</p>
+    </div>
+
+    <div class="map-card">
+        <div class="map-header">
+            <div>
+                <h3>Tất cả vị trí lễ hội</h3>
+                <p>Có <strong>@Model.Count</strong> lễ hội đang có tọa độ bản đồ.</p>
+            </div>
+        </div>
+
+        <div id="allFestivalMap"></div>
+    </div>
+</div>
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const festivals = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                Model.Select(f => new
+                {
+                        id = f.FestivalID,
+                        name = f.Name,
+                        location = f.LocationName,
+                        latitude = f.Latitude,
+                        longitude = f.Longitude
+                })
+        ));
+
+    const map = L.map('allFestivalMap').setView([36.2048, 138.2529], 5);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    festivals.forEach(f => {
+        const popup = `
+            <div style="min-width:180px;">
+                <b>${f.name}</b><br>
+                📍 ${f.location}<br>
+                <a href="/Festival/Details/${f.id}"
+                   style="display:inline-block;margin-top:8px;background:#dc3545;color:white;padding:6px 12px;border-radius:999px;text-decoration:none;font-weight:700;">
+                    Xem chi tiết
+                </a>
+            </div>
+        `;
+
+        L.marker([f.latitude, f.longitude])
+            .addTo(map)
+            .bindPopup(popup);
+    });
+</script>
+
+<style>
+    .tool-page {
+        padding-bottom: 40px;
+    }
+
+    .tool-hero {
+        background: linear-gradient(135deg, #fff0f2, #ffffff);
+        border: 1px solid #ffe0e5;
+        border-radius: 28px;
+        padding: 36px;
+        margin-bottom: 32px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+
+    .tool-badge {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ffd1d8;
+        color: #dc3545;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+
+    .tool-hero h1 {
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .tool-hero p {
+        color: #777;
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .map-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 28px;
+        padding: 24px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .map-header {
+        margin-bottom: 18px;
+    }
+
+        .map-header h3 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .map-header p {
+            color: #777;
+            margin-bottom: 0;
+        }
+
+    #allFestivalMap {
+        width: 100%;
+        height: 620px;
+        border-radius: 22px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+    }
+
+    @@media (max-width: 576px) {
+        #allFestivalMap {
+            height: 460px;
+        }
+
+        .tool-hero h1 {
+            font-size: 32px;
+        }
+    }
+</style>

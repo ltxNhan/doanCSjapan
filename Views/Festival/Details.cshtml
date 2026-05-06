@@ -1,0 +1,768 @@
+﻿@model JapanApp.Models.Festival
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="festival-detail-page">
+
+    <!-- BACK BUTTON -->
+    <div class="mb-4">
+        <a href="/Festival" class="btn btn-outline-secondary rounded-pill px-4">
+            ← Back to Festivals
+        </a>
+    </div>
+
+    <!-- HERO DETAIL CARD -->
+    <div class="detail-card shadow-lg">
+
+        <!-- IMAGE -->
+        <div class="detail-image-wrap">
+            <img src="@Url.Content("~/images/" + GetImageName(Model.Name))"
+                 onerror="this.onerror=null; this.src='@Url.Content("~/images/default.jpg")';"
+                 alt="@Model.Name"
+                 class="detail-image" />
+
+            <div class="image-overlay">
+                <span class="badge bg-danger px-3 py-2">Festival</span>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="detail-content">
+
+            <h1 class="festival-title">@Model.Name</h1>
+
+            <p class="festival-subtitle">
+                Discover one of Japan's most beautiful traditional festivals.
+            </p>
+
+            <div class="info-grid">
+
+                <!-- LOCATION CLICK -->
+                <div class="info-box location-click" onclick="showFestivalMap()">
+                    <div class="info-icon">📍</div>
+                    <div>
+                        <small>Location</small>
+                        <strong>@Model.LocationName</strong>
+                        <span class="map-hint">Click to view on map</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-icon">📅</div>
+                    <div>
+                        <small>Start Date</small>
+                        <strong>@GetUpcomingStartDate(Model.StartDate, Model.EndDate)</strong>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-icon">🏁</div>
+                    <div>
+                        <small>End Date</small>
+                        <strong>@GetUpcomingEndDate(Model.StartDate, Model.EndDate)</strong>
+                    </div>
+                </div>
+
+                @if (Model.Region != null)
+                {
+                    <div class="info-box">
+                        <div class="info-icon">🗾</div>
+                        <div>
+                            <small>Region</small>
+                            <strong>@Model.Region.RegionName</strong>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.Season != null)
+                {
+                    <div class="info-box">
+                        <div class="info-icon">🌸</div>
+                        <div>
+                            <small>Season</small>
+                            <strong>@Model.Season.SeasonName</strong>
+                        </div>
+                    </div>
+                }
+
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="section-block">
+                <h3>About this festival</h3>
+
+                <p>
+                    @Model.Content
+                </p>
+            </div>
+
+            <!-- MAP SECTION -->
+            <div id="mapSection" class="map-section">
+                <div class="map-header">
+                    <div>
+                        <h3>Location on Japan Map</h3>
+                        <p>@Model.Name - @Model.LocationName</p>
+                    </div>
+
+                    <span class="map-badge">OpenStreetMap API</span>
+                </div>
+
+                <div id="festivalMap"></div>
+            </div>
+
+            <div class="action-area">
+                <button type="button" class="btn btn-primary rounded-pill px-4 py-2" onclick="openFestivalCalendar()">
+                    📅 View Calendar
+                </button>
+
+                <a href="/Festival/AddFavorite/@Model.FestivalID" class="btn btn-danger rounded-pill px-4 py-2">
+                    ❤️ Add to Favorite
+                </a>
+
+                <a href="/Festival" class="btn btn-light border rounded-pill px-4 py-2">
+                    View More Festivals
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- CALENDAR MODAL -->
+<div id="calendarModal" class="calendar-modal">
+    <div class="calendar-box">
+        <div class="calendar-header">
+            <div>
+                <h3>Festival Calendar</h3>
+                <p>@Model.Name</p>
+            </div>
+
+            <button type="button" class="calendar-close" onclick="closeFestivalCalendar()">×</button>
+        </div>
+
+        <div class="calendar-date-info">
+            <div>
+                <small>Start Date</small>
+                <strong>@GetUpcomingStartDate(Model.StartDate, Model.EndDate)</strong>
+            </div>
+
+            <div>
+                <small>End Date</small>
+                <strong>@GetUpcomingEndDate(Model.StartDate, Model.EndDate)</strong>
+            </div>
+        </div>
+
+        <div class="calendar-month-title" id="calendarMonthTitle"></div>
+
+        <div class="calendar-weekdays">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+        </div>
+
+        <div id="calendarDays" class="calendar-days"></div>
+
+        <div class="calendar-note">
+            <span class="legend-active"></span>
+            Festival date range
+        </div>
+    </div>
+</div>
+
+<!-- LEAFLET MAP API -->
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    .festival-detail-page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 30px 15px 60px;
+    }
+
+    .detail-card {
+        background: white;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .detail-image-wrap {
+        position: relative;
+        width: 100%;
+        height: 430px;
+        overflow: hidden;
+        background: #f5f5f5;
+    }
+
+    .detail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .image-overlay {
+        position: absolute;
+        left: 28px;
+        bottom: 24px;
+    }
+
+    .detail-content {
+        padding: 38px 44px 44px;
+    }
+
+    .festival-title {
+        font-size: 42px;
+        font-weight: 800;
+        color: #222;
+        margin-bottom: 10px;
+    }
+
+    .festival-subtitle {
+        font-size: 18px;
+        color: #777;
+        margin-bottom: 28px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .info-box {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .info-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: #fff0f2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+    }
+
+    .info-box small {
+        display: block;
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .info-box strong {
+        display: block;
+        color: #222;
+        font-size: 16px;
+    }
+
+    .location-click {
+        cursor: pointer;
+        transition: 0.25s;
+    }
+
+        .location-click:hover {
+            background: #fff0f2;
+            border-color: #ef3b4d;
+            transform: translateY(-3px);
+        }
+
+    .map-hint {
+        display: block;
+        font-size: 12px;
+        color: #ef3b4d;
+        margin-top: 4px;
+    }
+
+    .section-block h3 {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 14px;
+        color: #222;
+    }
+
+    .section-block p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #555;
+        margin-bottom: 0;
+    }
+
+    .map-section {
+        margin-top: 40px;
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #eee;
+        padding: 24px;
+    }
+
+    .map-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+        .map-header h3 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #222;
+        }
+
+        .map-header p {
+            color: #777;
+            margin-bottom: 0;
+        }
+
+    .map-badge {
+        background: #fff0f2;
+        color: #ef3b4d;
+        border: 1px solid #ffd1d8;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    #festivalMap {
+        width: 100%;
+        height: 430px;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+    }
+
+    .action-area {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+        flex-wrap: wrap;
+    }
+
+    .calendar-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+        .calendar-modal.show {
+            display: flex;
+        }
+
+    .calendar-box {
+        width: 100%;
+        max-width: 560px;
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+    }
+
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+        .calendar-header h3 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: #222;
+        }
+
+        .calendar-header p {
+            margin-bottom: 0;
+            color: #777;
+        }
+
+    .calendar-close {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: #f4f4f4;
+        font-size: 28px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+        .calendar-close:hover {
+            background: #ffe1e6;
+            color: #ef3b4d;
+        }
+
+    .calendar-date-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+        .calendar-date-info div {
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .calendar-date-info small {
+            display: block;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .calendar-date-info strong {
+            color: #222;
+        }
+
+    .calendar-month-title {
+        text-align: center;
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .calendar-weekdays,
+    .calendar-days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+    }
+
+        .calendar-weekdays span {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            font-weight: 700;
+        }
+
+    .calendar-day {
+        height: 46px;
+        border-radius: 14px;
+        background: #f7f7f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-weight: 600;
+    }
+
+        .calendar-day.empty {
+            background: transparent;
+        }
+
+        .calendar-day.active {
+            background: #ef3b4d;
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #222;
+        }
+
+    .calendar-note {
+        margin-top: 18px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .legend-active {
+        width: 16px;
+        height: 16px;
+        background: #ef3b4d;
+        border-radius: 5px;
+        display: inline-block;
+    }
+
+    @@media (max-width: 992px) {
+        .info-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .festival-title {
+            font-size: 34px;
+        }
+
+        .detail-image-wrap {
+            height: 350px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .detail-content {
+            padding: 28px 22px 32px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .festival-title {
+            font-size: 30px;
+        }
+
+        .detail-image-wrap {
+            height: 260px;
+        }
+
+        .map-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #festivalMap {
+            height: 320px;
+        }
+
+        .calendar-date-info {
+            grid-template-columns: 1fr;
+        }
+
+        .calendar-day {
+            height: 38px;
+            border-radius: 10px;
+        }
+    }
+</style>
+
+<script>
+    let festivalMap;
+    let festivalMarker;
+
+    const festivalLatitude = @Model.Latitude;
+    const festivalLongitude = @Model.Longitude;
+    const festivalName = "@Model.Name";
+    const festivalLocation = "@Model.LocationName";
+
+    function initFestivalMap() {
+        let lat = festivalLatitude;
+        let lng = festivalLongitude;
+
+        if (lat === 0 || lng === 0) {
+            lat = 36.2048;
+            lng = 138.2529;
+        }
+
+        festivalMap = L.map('festivalMap').setView([lat, lng], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(festivalMap);
+
+        if (festivalLatitude !== 0 && festivalLongitude !== 0) {
+            festivalMarker = L.marker([festivalLatitude, festivalLongitude])
+                .addTo(festivalMap)
+                .bindPopup("<b>" + festivalName + "</b><br>" + festivalLocation);
+        }
+    }
+
+    function showFestivalMap() {
+        document.getElementById("mapSection").scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        setTimeout(function () {
+            if (festivalLatitude !== 0 && festivalLongitude !== 0) {
+                festivalMap.setView([festivalLatitude, festivalLongitude], 14);
+                festivalMarker.openPopup();
+            } else {
+                festivalMap.setView([36.2048, 138.2529], 5);
+                alert("Lễ hội này chưa có tọa độ bản đồ. Hãy thêm Latitude và Longitude trong database.");
+            }
+
+            festivalMap.invalidateSize();
+        }, 500);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        initFestivalMap();
+    });
+</script>
+
+<script>
+    const calendarStartDate = new Date("@GetDisplayStartDate(Model.StartDate, Model.EndDate).ToString("yyyy-MM-dd")T00:00:00");
+    const calendarEndDate = new Date("@GetDisplayEndDate(Model.StartDate, Model.EndDate).ToString("yyyy-MM-dd")T00:00:00");
+
+    function openFestivalCalendar() {
+        document.getElementById("calendarModal").classList.add("show");
+        renderFestivalCalendar();
+    }
+
+    function closeFestivalCalendar() {
+        document.getElementById("calendarModal").classList.remove("show");
+    }
+
+    function renderFestivalCalendar() {
+        const monthTitle = document.getElementById("calendarMonthTitle");
+        const calendarDays = document.getElementById("calendarDays");
+
+        calendarDays.innerHTML = "";
+
+        const year = calendarStartDate.getFullYear();
+        const month = calendarStartDate.getMonth();
+
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        monthTitle.innerText = monthNames[month] + " " + year;
+
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+
+        const startWeekDay = firstDay.getDay();
+        const totalDays = lastDay.getDate();
+
+        for (let i = 0; i < startWeekDay; i++) {
+            const empty = document.createElement("div");
+            empty.className = "calendar-day empty";
+            calendarDays.appendChild(empty);
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let day = 1; day <= totalDays; day++) {
+            const currentDate = new Date(year, month, day);
+            currentDate.setHours(0, 0, 0, 0);
+
+            const dayBox = document.createElement("div");
+            dayBox.className = "calendar-day";
+            dayBox.innerText = day;
+
+            if (currentDate >= calendarStartDate && currentDate <= calendarEndDate) {
+                dayBox.classList.add("active");
+            }
+
+            if (currentDate.getTime() === today.getTime()) {
+                dayBox.classList.add("today");
+            }
+
+            calendarDays.appendChild(dayBox);
+        }
+    }
+
+    window.addEventListener("click", function (event) {
+        const modal = document.getElementById("calendarModal");
+
+        if (event.target === modal) {
+            closeFestivalCalendar();
+        }
+    });
+</script>
+
+@functions {
+    public DateTime GetDisplayStartDate(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayStart = new DateTime(today.Year, startDate.Month, startDate.Day);
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        if (displayEnd < today)
+        {
+            displayStart = new DateTime(today.Year + 1, startDate.Month, startDate.Day);
+        }
+
+        return displayStart;
+    }
+
+    public DateTime GetDisplayEndDate(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        if (displayEnd < today)
+        {
+            displayEnd = new DateTime(today.Year + 1, endDate.Month, endDate.Day);
+        }
+
+        return displayEnd;
+    }
+
+    public string GetUpcomingStartDate(DateTime startDate, DateTime endDate)
+    {
+        return GetDisplayStartDate(startDate, endDate).ToString("dd/MM/yyyy");
+    }
+
+    public string GetUpcomingEndDate(DateTime startDate, DateTime endDate)
+    {
+        return GetDisplayEndDate(startDate, endDate).ToString("dd/MM/yyyy");
+    }
+
+    public string GetImageName(string name)
+    {
+        name = (name ?? "").ToLower();
+
+        if (name.Contains("hanami")) return "tokyo-hanami.jpg";
+        if (name.Contains("sumida")) return "tokyo-sumida.jpg";
+        if (name.Contains("kanda")) return "tokyo-kanda.jpg";
+        if (name.Contains("asakusa")) return "tokyo-asakusa.jpg";
+
+        if (name.Contains("gion")) return "kyoto-gion.jpg";
+        if (name.Contains("aoi")) return "kyoto-aoi1.jpg";
+        if (name.Contains("jidai")) return "kyoto-jidai.jpg";
+
+        if (name.Contains("tenjin")) return "osaka-tenjin.jpg";
+        if (name.Contains("sumiyoshi")) return "osaka-sumiyoshi.jpg";
+
+        if (name.Contains("snow")) return "sapporo-snow.jpg";
+        if (name.Contains("yosakoi")) return "sapporo-yosakoi.jpg";
+
+        if (name.Contains("hakata")) return "fukuoka-hakata.jpg";
+        if (name.Contains("lantern")) return "nagasaki-lantern.jpg";
+
+        if (name.Contains("takayama")) return "takayama.jpg";
+        if (name.Contains("fuji")) return "fuji.jpg";
+
+        if (name.Contains("akita")) return "akita.jpg";
+        if (name.Contains("nebuta")) return "nebuta.jpg";
+        if (name.Contains("sendai")) return "sendai.jpg";
+        if (name.Contains("okinawa")) return "okinawa.jpg";
+        if (name.Contains("kumamoto")) return "kumamoto.jpg";
+        if (name.Contains("nagoya")) return "nagoya.jpg";
+        if (name.Contains("kanazawa")) return "kanazawa.jpg";
+        if (name.Contains("kobe")) return "kobe.jpg";
+        if (name.Contains("nara")) return "nara.jpg";
+        if (name.Contains("chichibu")) return "chichibu.jpg";
+        if (name.Contains("kawagoe")) return "kawagoe.jpg";
+
+        return "default.jpg";
+    }
+}

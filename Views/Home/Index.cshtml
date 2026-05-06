@@ -1,0 +1,274 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<div class="home-page">
+
+    <!-- HERO VIDEO -->
+    <section class="home-hero">
+        <video autoplay muted loop playsinline class="home-hero-video">
+            <source src="@Url.Content("~/videos/japan-hero.mp4")" type="video/mp4" />
+        </video>
+
+        <div class="home-hero-overlay"></div>
+
+        <div class="home-hero-content">
+            <div class="hero-animate">
+                <span class="home-hero-badge">🎌 Japan Festival</span>
+
+                <h1>
+                    Khám phá sắc màu <br />
+                    lễ hội Nhật Bản
+                </h1>
+
+                <p>
+                    Tìm hiểu các lễ hội truyền thống, mùa hoa anh đào, pháo hoa mùa hè,
+                    lễ hội tuyết và những sự kiện văn hóa đặc sắc trên khắp Nhật Bản.
+                </p>
+
+                <div class="home-hero-actions">
+                    <a href="/Festival" class="btn home-btn-primary">
+                        Khám phá ngay
+                    </a>
+
+                    <a href="/Calendar" class="btn home-btn-secondary">
+                        Xem lịch lễ hội
+                    </a>
+                </div>
+
+                <div class="home-hero-stats">
+                    <div>
+                        <strong>20+</strong>
+                        <span>Lễ hội nổi bật</span>
+                    </div>
+
+                    <div>
+                        <strong>4</strong>
+                        <span>Mùa lễ hội</span>
+                    </div>
+
+                    <div>
+                        <strong>Map</strong>
+                        <span>Tích hợp bản đồ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-hint">
+            <span></span>
+            Cuộn xuống
+        </div>
+    </section>
+
+    <!-- FOUR SEASONS -->
+    <section class="season-section container">
+        <div class="home-section-heading text-center">
+            <span class="home-section-badge">🌸 Four Seasons</span>
+            <h2>4 mùa lễ hội Nhật Bản</h2>
+            <p>
+                Mỗi mùa tại Nhật Bản đều có những lễ hội mang màu sắc riêng,
+                từ hoa anh đào mùa xuân đến tuyết trắng mùa đông.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- MÙA XUÂN -->
+            <div class="col-lg-3 col-md-6">
+                <a href="/Festival?seasonId=1" class="season-card-link">
+                    <div class="season-card spring-card">
+                        <div class="season-icon">🌸</div>
+                        <h3>Mùa xuân</h3>
+                        <p>Hoa anh đào, Hanami, không khí nhẹ nhàng và lãng mạn.</p>
+                        <span class="season-link-text">Xem lễ hội →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- MÙA HÈ -->
+            <div class="col-lg-3 col-md-6">
+                <a href="/Festival?seasonId=2" class="season-card-link">
+                    <div class="season-card summer-card">
+                        <div class="season-icon">🎆</div>
+                        <h3>Mùa hè</h3>
+                        <p>Lễ hội pháo hoa, diễu hành, múa truyền thống và matsuri.</p>
+                        <span class="season-link-text">Xem lễ hội →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- MÙA THU -->
+            <div class="col-lg-3 col-md-6">
+                <a href="/Festival?seasonId=3" class="season-card-link">
+                    <div class="season-card autumn-card">
+                        <div class="season-icon">🍁</div>
+                        <h3>Mùa thu</h3>
+                        <p>Sắc lá đỏ, lễ hội đền chùa và không gian văn hóa cổ kính.</p>
+                        <span class="season-link-text">Xem lễ hội →</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- MÙA ĐÔNG -->
+            <div class="col-lg-3 col-md-6">
+                <a href="/Festival?seasonId=4" class="season-card-link">
+                    <div class="season-card winter-card">
+                        <div class="season-icon">❄️</div>
+                        <h3>Mùa đông</h3>
+                        <p>Lễ hội tuyết, ánh sáng mùa đông và khung cảnh lung linh.</p>
+                        <span class="season-link-text">Xem lễ hội →</span>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FEATURED FESTIVALS -->
+    <section class="featured-section">
+        <div class="container">
+            <div class="home-section-heading text-center">
+                <span class="home-section-badge">🏮 Featured Festivals</span>
+                <h2>Lễ hội nổi bật</h2>
+                <p>
+                    Một số lễ hội tiêu biểu giúp người dùng nhanh chóng bắt đầu hành trình khám phá văn hóa Nhật Bản.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="home-festival-card">
+                        <img src="@Url.Content("~/images/kyoto-gion.jpg")"
+                             onerror="this.src='@Url.Content("~/images/default.jpg")';"
+                             alt="Gion Matsuri" />
+
+                        <div class="home-festival-content">
+                            <span>Kyoto</span>
+                            <h3>Gion Matsuri</h3>
+                            <p>Lễ hội truyền thống nổi tiếng tại Kyoto với các đoàn rước hoành tráng.</p>
+                            <a href="/Festival?keyword=Gion">Khám phá →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="home-festival-card">
+                        <img src="@Url.Content("~/images/tokyo-hanami.jpg")"
+                             onerror="this.src='@Url.Content("~/images/default.jpg")';"
+                             alt="Hanami Ueno" />
+
+                        <div class="home-festival-content">
+                            <span>Tokyo</span>
+                            <h3>Hanami Ueno</h3>
+                            <p>Không gian ngắm hoa anh đào đặc trưng của mùa xuân Nhật Bản.</p>
+                            <a href="/Festival?seasonId=1">Khám phá →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="home-festival-card">
+                        <img src="@Url.Content("~/images/sapporo-snow.jpg")"
+                             onerror="this.src='@Url.Content("~/images/default.jpg")';"
+                             alt="Sapporo Snow Festival" />
+
+                        <div class="home-festival-content">
+                            <span>Hokkaido</span>
+                            <h3>Sapporo Snow Festival</h3>
+                            <p>Lễ hội tuyết nổi bật với các tác phẩm điêu khắc băng tuyết ấn tượng.</p>
+                            <a href="/Festival?seasonId=4">Khám phá →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="/Festival" class="btn btn-danger rounded-pill px-4 py-2">
+                    Xem tất cả lễ hội
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAP AND CALENDAR -->
+    <section class="map-calendar-section container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-6">
+                <div class="home-tool-card map-tool">
+                    <div class="tool-content">
+                        <span class="home-section-badge">🗺️ Japan Map</span>
+                        <h2>Bản đồ lễ hội</h2>
+                        <p>
+                            Xem vị trí các lễ hội trên bản đồ Nhật Bản.
+                            Mỗi địa điểm được đánh dấu giúp bạn dễ hình dung khu vực tổ chức.
+                        </p>
+
+                        <a href="/Map" class="btn btn-light rounded-pill px-4 py-2">
+                            Mở bản đồ
+                        </a>
+                    </div>
+
+                    <div class="tool-visual">
+                        <div class="map-pin pin-1">📍</div>
+                        <div class="map-pin pin-2">📍</div>
+                        <div class="map-pin pin-3">📍</div>
+                        <div class="japan-map-shape">日本</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="home-tool-card calendar-tool">
+                    <div class="tool-content">
+                        <span class="home-section-badge">📅 Festival Calendar</span>
+                        <h2>Lịch lễ hội</h2>
+                        <p>
+                            Theo dõi các lễ hội theo tháng. Hệ thống tự hiển thị thời gian ở năm hiện tại
+                            hoặc năm tương lai nếu lễ hội năm nay đã kết thúc.
+                        </p>
+
+                        <a href="/Calendar" class="btn btn-danger rounded-pill px-4 py-2">
+                            Xem lịch
+                        </a>
+                    </div>
+
+                    <div class="mini-calendar">
+                        <div class="mini-calendar-top"></div>
+                        <div class="mini-calendar-body">
+                            <span>@DateTime.Today.ToString("MMM")</span>
+                            <strong>@DateTime.Today.ToString("dd")</strong>
+                            <small>@DateTime.Today.Year</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="home-final-cta">
+        <div class="container">
+            <div class="final-cta-card">
+                <div>
+                    <span class="home-section-badge">✈️ Travel Support</span>
+                    <h2>Sẵn sàng khám phá Nhật Bản?</h2>
+                    <p>
+                        Lưu lễ hội yêu thích, xem lịch sự kiện và liên hệ tư vấn chuyến đi theo mùa lễ hội.
+                    </p>
+                </div>
+
+                <div class="final-actions">
+                    <a href="/Favorite" class="btn btn-light rounded-pill px-4 py-2">
+                        ❤️ Theo dõi
+                    </a>
+
+                    <a href="/Contact" class="btn btn-danger rounded-pill px-4 py-2">
+                        ✈️ Tư vấn vé
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>

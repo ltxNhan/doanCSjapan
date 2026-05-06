@@ -1,0 +1,143 @@
+﻿@model List<JapanApp.Models.Region>
+
+@{
+    ViewData["Title"] = "Địa điểm";
+}
+
+<div class="tool-page">
+    <div class="tool-hero">
+        <span class="tool-badge">📍 Location</span>
+        <h1>Địa điểm lễ hội</h1>
+        <p>Khám phá các lễ hội Nhật Bản theo từng vùng và thành phố.</p>
+    </div>
+
+    <div class="row">
+        @foreach (var region in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="location-card h-100">
+                    <div class="location-icon">🗾</div>
+
+                    <h3>@region.RegionName</h3>
+
+                    <p class="text-muted">
+                        Có <strong>@(region.Festivals?.Count ?? 0)</strong> lễ hội
+                    </p>
+
+                    @if (region.Festivals != null && region.Festivals.Any())
+                    {
+                        <ul class="festival-list">
+                            @foreach (var f in region.Festivals.Take(4))
+                            {
+                                <li>
+                                    <a href="/Festival/Details/@f.FestivalID">
+                                        @f.Name
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Chưa có lễ hội trong khu vực này.</p>
+                    }
+
+                    <a href="/Festival?regionId=@region.RegionID" class="btn btn-danger rounded-pill px-4 mt-3">
+                        Xem lễ hội
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .tool-page {
+        padding-bottom: 40px;
+    }
+
+    .tool-hero {
+        background: linear-gradient(135deg, #fff0f2, #ffffff);
+        border: 1px solid #ffe0e5;
+        border-radius: 28px;
+        padding: 36px;
+        margin-bottom: 32px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+
+    .tool-badge {
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #ffd1d8;
+        color: #dc3545;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-weight: 800;
+        margin-bottom: 14px;
+    }
+
+    .tool-hero h1 {
+        font-size: 42px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    .tool-hero p {
+        color: #777;
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .location-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 24px;
+        padding: 26px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        transition: 0.25s;
+    }
+
+        .location-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.13);
+        }
+
+    .location-icon {
+        width: 58px;
+        height: 58px;
+        background: #fff0f2;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 18px;
+    }
+
+    .location-card h3 {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .festival-list {
+        list-style: none;
+        padding-left: 0;
+        margin-top: 14px;
+        margin-bottom: 0;
+    }
+
+        .festival-list li {
+            margin-bottom: 8px;
+        }
+
+        .festival-list a {
+            text-decoration: none;
+            color: #dc3545;
+            font-weight: 700;
+        }
+
+            .festival-list a:hover {
+                text-decoration: underline;
+            }
+</style>

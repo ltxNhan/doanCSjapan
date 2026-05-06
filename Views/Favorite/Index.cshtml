@@ -1,0 +1,144 @@
+﻿@model List<JapanApp.Models.Festival>
+
+<h2 class="mb-4">❤️ Lễ hội đang theo dõi</h2>
+
+@if (Context.Session.GetString("UserID") == null)
+{
+    <div class="alert alert-warning rounded-4">
+        Bạn đang theo dõi với tư cách khách. Danh sách này được lưu tạm trong phiên trình duyệt.
+    </div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="soft-card p-5 text-center">
+        <h3 class="fw-bold">Bạn chưa theo dõi lễ hội nào</h3>
+        <p class="text-muted mt-2">
+            Hãy khám phá các lễ hội Nhật Bản và bấm nút Theo dõi để lưu lại.
+        </p>
+
+        <a href="/Festival" class="btn btn-danger rounded-pill px-4 mt-3">
+            🎌 Khám phá lễ hội
+        </a>
+    </div>
+}
+else
+{
+    <p class="text-muted mb-4">
+        Bạn đang theo dõi <strong>@Model.Count</strong> lễ hội.
+    </p>
+
+    <div class="row">
+        @foreach (var f in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100 favorite-card">
+
+                    <a href="/Festival/Details/@f.FestivalID">
+                        <img src="@Url.Content("~/images/" + GetImageName(f.Name))"
+                             onerror="this.onerror=null; this.src='@Url.Content("~/images/default.jpg")';"
+                             style="height:200px; object-fit:cover; width:100%;"
+                             alt="@f.Name" />
+                    </a>
+
+                    <div class="p-3">
+                        <h5 class="fw-bold">@f.Name</h5>
+
+                        <p class="text-muted mb-1">
+                            📍 @f.LocationName
+                        </p>
+
+                        <p class="text-muted">
+                            📅 @GetUpcomingDateRange(f.StartDate, f.EndDate)
+                        </p>
+
+                        <div class="d-flex gap-2 flex-wrap mt-3">
+                            <a href="/Festival/Details/@f.FestivalID"
+                               class="btn btn-sm btn-danger rounded-pill px-3">
+                                Xem chi tiết
+                            </a>
+
+                            <a href="/Favorite/Remove?festivalId=@f.FestivalID"
+                               class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                               onclick="return confirm('Bạn có muốn bỏ theo dõi lễ hội này không?')">
+                                Bỏ theo dõi
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .favorite-card {
+        border-radius: 18px;
+        border: 1px solid #eee;
+        overflow: hidden;
+    }
+</style>
+
+@functions {
+    public string GetUpcomingDateRange(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayStart = new DateTime(today.Year, startDate.Month, startDate.Day);
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        if (displayEnd < today)
+        {
+            displayStart = new DateTime(today.Year + 1, startDate.Month, startDate.Day);
+            displayEnd = new DateTime(today.Year + 1, endDate.Month, endDate.Day);
+        }
+
+        if (displayStart.Date == displayEnd.Date)
+        {
+            return displayStart.ToString("dd/MM/yyyy");
+        }
+
+        return $"{displayStart:dd/MM/yyyy} - {displayEnd:dd/MM/yyyy}";
+    }
+
+    public string GetImageName(string name)
+    {
+        name = (name ?? "").ToLower();
+
+        if (name.Contains("hanami")) return "tokyo-hanami.jpg";
+        if (name.Contains("sumida")) return "tokyo-sumida.jpg";
+        if (name.Contains("kanda")) return "tokyo-kanda.jpg";
+        if (name.Contains("asakusa")) return "tokyo-asakusa.jpg";
+
+        if (name.Contains("gion")) return "kyoto-gion.jpg";
+        if (name.Contains("aoi")) return "kyoto-aoi1.jpg";
+        if (name.Contains("jidai")) return "kyoto-jidai.jpg";
+
+        if (name.Contains("tenjin")) return "osaka-tenjin.jpg";
+        if (name.Contains("sumiyoshi")) return "osaka-sumiyoshi.jpg";
+
+        if (name.Contains("snow")) return "sapporo-snow.jpg";
+        if (name.Contains("yosakoi")) return "sapporo-yosakoi.jpg";
+
+        if (name.Contains("hakata")) return "fukuoka-hakata.jpg";
+        if (name.Contains("lantern")) return "nagasaki-lantern.jpg";
+
+        if (name.Contains("takayama")) return "takayama.jpg";
+        if (name.Contains("fuji")) return "fuji.jpg";
+
+        if (name.Contains("akita")) return "akita.jpg";
+        if (name.Contains("nebuta")) return "nebuta.jpg";
+        if (name.Contains("sendai")) return "sendai.jpg";
+        if (name.Contains("okinawa")) return "okinawa.jpg";
+        if (name.Contains("kumamoto")) return "kumamoto.jpg";
+        if (name.Contains("nagoya")) return "nagoya.jpg";
+        if (name.Contains("kanazawa")) return "kanazawa.jpg";
+        if (name.Contains("kobe")) return "kobe.jpg";
+        if (name.Contains("nara")) return "nara.jpg";
+        if (name.Contains("chichibu")) return "chichibu.jpg";
+        if (name.Contains("kawagoe")) return "kawagoe.jpg";
+
+        return "default.jpg";
+    }
+}

@@ -1,0 +1,341 @@
+@model List<JapanApp.Models.Festival>
+
+@{
+    var selectedSeason = ViewBag.SeasonId as int?;
+}
+
+<div class="festival-page-header mb-4">
+    <span class="section-badge">🎌 Japan Festivals</span>
+    <h2 class="mt-2 mb-2">@(ViewBag.FilterTitle ?? "🎌 Explore Japan Festivals")</h2>
+
+    @if (Model != null)
+    {
+        <p class="text-muted mb-0">
+            Tìm thấy <strong>@Model.Count</strong> lễ hội phù hợp.
+        </p>
+    }
+</div>
+
+<!-- 🔥 ADMIN BUTTON -->
+@if (Context.Session.GetString("Role") == "Admin")
+{
+    <a href="/Festival/Create" class="btn btn-success mb-3">+ Add Festival</a>
+}
+
+<!-- SEARCH + FILTER -->
+<form method="get" class="mb-4 festival-filter-box">
+    <div class="row g-3 align-items-end">
+
+        <div class="col-lg-5 col-md-12">
+            <label class="form-label fw-bold">Tìm kiếm lễ hội</label>
+            <input type="text"
+                   name="keyword"
+                   value="@ViewBag.Keyword"
+                   class="form-control shadow-sm filter-input"
+                   placeholder="🔍 Nhập tên lễ hội..." />
+        </div>
+
+        <div class="col-lg-4 col-md-7">
+            <label class="form-label fw-bold">Lọc theo mùa</label>
+            <select name="seasonId" class="form-select shadow-sm filter-input">
+                <option value="">Tất cả mùa</option>
+
+                @if (selectedSeason == 1)
+                {
+                    <option value="1" selected>🌸 Mùa xuân</option>
+                }
+                else
+                {
+                    <option value="1">🌸 Mùa xuân</option>
+                }
+
+                @if (selectedSeason == 2)
+                {
+                    <option value="2" selected>🎆 Mùa hè</option>
+                }
+                else
+                {
+                    <option value="2">🎆 Mùa hè</option>
+                }
+
+                @if (selectedSeason == 3)
+                {
+                    <option value="3" selected>🍁 Mùa thu</option>
+                }
+                else
+                {
+                    <option value="3">🍁 Mùa thu</option>
+                }
+
+                @if (selectedSeason == 4)
+                {
+                    <option value="4" selected>❄️ Mùa đông</option>
+                }
+                else
+                {
+                    <option value="4">❄️ Mùa đông</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-lg-3 col-md-5 d-flex gap-2 flex-wrap">
+            <button type="submit" class="btn btn-danger rounded-pill px-4">
+                Lọc
+            </button>
+
+            <a href="/Festival" class="btn btn-light border rounded-pill px-4">
+                Xóa lọc
+            </a>
+        </div>
+
+    </div>
+</form>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="empty-result-box text-center p-5">
+        <div class="empty-icon">🔎</div>
+        <h3>Không tìm thấy lễ hội phù hợp</h3>
+        <p class="text-muted">
+            Bạn hãy thử đổi từ khóa tìm kiếm hoặc chọn mùa khác.
+        </p>
+        <a href="/Festival" class="btn btn-danger rounded-pill px-4 mt-2">
+            Xem tất cả lễ hội
+        </a>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var f in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100 festival-card">
+
+                    <!-- IMAGE CLICK DETAILS -->
+                    <a href="/Festival/Details/@f.FestivalID" class="text-decoration-none text-dark">
+                        <img src="@Url.Content("~/images/" + GetImageName(f.Name))"
+                             onerror="this.onerror=null; this.src='@Url.Content("~/images/default.jpg")';"
+                             style="height:200px; object-fit:cover; width:100%;"
+                             alt="@f.Name" />
+                    </a>
+
+                    <div class="p-3">
+
+                        <!-- TITLE CLICK DETAILS -->
+                        <a href="/Festival/Details/@f.FestivalID" class="text-decoration-none text-dark">
+                            <h5 class="fw-bold">@f.Name</h5>
+                        </a>
+
+                        <!-- LOCATION -->
+                        <p class="text-muted mb-1">📍 @f.LocationName</p>
+
+                        <!-- DATE AUTO CURRENT / FUTURE YEAR -->
+                        <p class="text-muted">
+                            📅 @GetUpcomingDateRange(f.StartDate, f.EndDate)
+                        </p>
+
+                        @if (f.Season != null)
+                        {
+                            <p class="festival-season-text">
+                                @GetSeasonIcon(f.Season.SeasonName) @GetSeasonDisplayName(f.Season.SeasonName)
+                            </p>
+                        }
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <!-- BADGE -->
+                            <span class="badge bg-danger">Festival</span>
+
+                            <!-- FAVORITE BUTTON -->
+                            <a href="/Festival/AddFavorite/@f.FestivalID"
+                               class="btn btn-sm btn-outline-danger rounded-pill px-3 follow-btn">
+                                ❤️ Theo dõi
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .festival-page-header {
+        background: linear-gradient(135deg, #fff0f2, #ffffff);
+        border: 1px solid #ffe0e5;
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+
+        .festival-page-header h2 {
+            font-size: 38px;
+            font-weight: 900;
+            color: #222;
+        }
+
+    .festival-filter-box {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+    }
+
+    .filter-input {
+        border-radius: 16px;
+        padding: 12px 15px;
+        border: 1px solid #e5e5e5;
+    }
+
+        .filter-input:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.18rem rgba(220, 53, 69, 0.15);
+        }
+
+    .festival-card {
+        transition: 0.25s;
+        border-radius: 18px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+        .festival-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18) !important;
+        }
+
+        .festival-card .follow-btn {
+            position: relative;
+            z-index: 10;
+            font-weight: 700;
+        }
+
+            .festival-card .follow-btn:hover {
+                background: #dc3545;
+                color: #fff;
+            }
+
+    .festival-season-text {
+        display: inline-block;
+        background: #fff0f2;
+        color: #dc3545;
+        border: 1px solid #ffd1d8;
+        border-radius: 999px;
+        padding: 5px 12px;
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+
+    .empty-result-box {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 28px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+    }
+
+    @@media (max-width: 576px) {
+        .festival-page-header h2 {
+            font-size: 30px;
+        }
+
+        .festival-filter-box {
+            padding: 18px;
+        }
+    }
+</style>
+
+@functions {
+    public string GetUpcomingDateRange(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayStart = new DateTime(today.Year, startDate.Month, startDate.Day);
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        // Nếu lễ hội năm nay đã kết thúc thì tự chuyển sang năm sau
+        if (displayEnd < today)
+        {
+            displayStart = new DateTime(today.Year + 1, startDate.Month, startDate.Day);
+            displayEnd = new DateTime(today.Year + 1, endDate.Month, endDate.Day);
+        }
+
+        if (displayStart.Date == displayEnd.Date)
+        {
+            return displayStart.ToString("dd/MM/yyyy");
+        }
+
+        return $"{displayStart:dd/MM/yyyy} - {displayEnd:dd/MM/yyyy}";
+    }
+
+    public string GetSeasonIcon(string seasonName)
+    {
+        seasonName = (seasonName ?? "").ToLower();
+
+        if (seasonName.Contains("spring") || seasonName.Contains("xuân")) return "🌸";
+        if (seasonName.Contains("summer") || seasonName.Contains("hè")) return "🎆";
+        if (seasonName.Contains("autumn") || seasonName.Contains("fall") || seasonName.Contains("thu")) return "🍁";
+        if (seasonName.Contains("winter") || seasonName.Contains("đông")) return "❄️";
+
+        return "🌸";
+    }
+
+    public string GetSeasonDisplayName(string seasonName)
+    {
+        seasonName = (seasonName ?? "").ToLower();
+
+        if (seasonName.Contains("spring") || seasonName.Contains("xuân")) return "Mùa xuân";
+        if (seasonName.Contains("summer") || seasonName.Contains("hè")) return "Mùa hè";
+        if (seasonName.Contains("autumn") || seasonName.Contains("fall") || seasonName.Contains("thu")) return "Mùa thu";
+        if (seasonName.Contains("winter") || seasonName.Contains("đông")) return "Mùa đông";
+
+        return "Festival";
+    }
+
+    public string GetImageName(string name)
+    {
+        name = (name ?? "").ToLower();
+
+        if (name.Contains("hanami")) return "tokyo-hanami.jpg";
+        if (name.Contains("sumida")) return "tokyo-sumida.jpg";
+        if (name.Contains("kanda")) return "tokyo-kanda.jpg";
+        if (name.Contains("asakusa")) return "tokyo-asakusa.jpg";
+
+        if (name.Contains("gion")) return "kyoto-gion.jpg";
+        if (name.Contains("aoi")) return "kyoto-aoi1.jpg";
+        if (name.Contains("jidai")) return "kyoto-jidai.jpg";
+
+        if (name.Contains("tenjin")) return "osaka-tenjin.jpg";
+        if (name.Contains("sumiyoshi")) return "osaka-sumiyoshi.jpg";
+
+        if (name.Contains("snow")) return "sapporo-snow.jpg";
+        if (name.Contains("yosakoi")) return "sapporo-yosakoi.jpg";
+
+        if (name.Contains("hakata")) return "fukuoka-hakata.jpg";
+        if (name.Contains("lantern")) return "nagasaki-lantern.jpg";
+
+        if (name.Contains("takayama")) return "takayama.jpg";
+        if (name.Contains("fuji")) return "fuji.jpg";
+
+        if (name.Contains("akita")) return "akita.jpg";
+        if (name.Contains("nebuta")) return "nebuta.jpg";
+        if (name.Contains("sendai")) return "sendai.jpg";
+        if (name.Contains("okinawa")) return "okinawa.jpg";
+        if (name.Contains("kumamoto")) return "kumamoto.jpg";
+        if (name.Contains("nagoya")) return "nagoya.jpg";
+        if (name.Contains("kanazawa")) return "kanazawa.jpg";
+        if (name.Contains("kobe")) return "kobe.jpg";
+        if (name.Contains("nara")) return "nara.jpg";
+        if (name.Contains("chichibu")) return "chichibu.jpg";
+        if (name.Contains("kawagoe")) return "kawagoe.jpg";
+
+        return "default.jpg";
+    }
+}

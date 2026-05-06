@@ -1,0 +1,606 @@
+﻿@model List<JapanApp.Models.Festival>
+
+@{
+    ViewData["Title"] = "Lịch lễ hội";
+
+    var festivals = Model
+        .Select(f => new
+        {
+            Festival = f,
+            Start = GetDisplayStartDate(f.StartDate, f.EndDate),
+            End = GetDisplayEndDate(f.StartDate, f.EndDate)
+        })
+        .OrderBy(x => x.Start)
+        .ToList();
+
+    var upcoming = festivals.Take(3).ToList();
+
+    var groups = festivals
+        .GroupBy(x => new { x.Start.Year, x.Start.Month })
+        .OrderBy(g => g.Key.Year)
+        .ThenBy(g => g.Key.Month);
+}
+
+<div class="calendar-page">
+
+    <!-- HERO -->
+    <section class="calendar-hero">
+        <div>
+            <span class="calendar-badge">📅 Festival Timeline</span>
+            <h1>Lịch lễ hội Nhật Bản</h1>
+            <p>
+                Theo dõi các lễ hội sắp diễn ra theo từng tháng. Hệ thống tự chuyển năm
+                hiện tại hoặc năm tương lai nếu lễ hội năm nay đã kết thúc.
+            </p>
+
+            <div class="hero-actions">
+                <a href="/Festival" class="btn btn-danger rounded-pill px-4 py-2">
+                    🎌 Khám phá lễ hội
+                </a>
+
+                <a href="/Map" class="btn btn-light border rounded-pill px-4 py-2">
+                    🗺️ Xem bản đồ
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-calendar-box">
+            <div class="mini-calendar-top">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="mini-calendar-main">
+                <div class="mini-month">@DateTime.Today.ToString("MMMM")</div>
+                <div class="mini-day">@DateTime.Today.ToString("dd")</div>
+                <div class="mini-year">@DateTime.Today.Year</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- UPCOMING -->
+    <section class="upcoming-section">
+        <div class="section-heading">
+            <div>
+                <h2>🔥 Lễ hội sắp diễn ra</h2>
+                <p>Những sự kiện gần nhất theo lịch hiện tại.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            @foreach (var item in upcoming)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="upcoming-card">
+                        <div class="date-block">
+                            <strong>@item.Start.ToString("dd")</strong>
+                            <span>@item.Start.ToString("MM/yyyy")</span>
+                        </div>
+
+                        <div class="upcoming-content">
+                            <h4>@item.Festival.Name</h4>
+                            <p>📍 @item.Festival.LocationName</p>
+
+                            <div class="date-range">
+                                @FormatDateRange(item.Start, item.End)
+                            </div>
+
+                            <a href="/Festival/Details/@item.Festival.FestivalID">
+                                Xem chi tiết →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="timeline-section">
+        <div class="section-heading">
+            <div>
+                <h2>🗓️ Lịch theo tháng</h2>
+                <p>Các lễ hội được nhóm theo tháng để dễ theo dõi.</p>
+            </div>
+        </div>
+
+        <div class="timeline">
+
+            @foreach (var group in groups)
+            {
+                <div class="timeline-month">
+                    <div class="timeline-marker">
+                        <div class="marker-dot"></div>
+                        <div class="marker-line"></div>
+                    </div>
+
+                    <div class="month-card">
+                        <div class="month-card-header">
+                            <div>
+                                <span class="month-label">Tháng @group.Key.Month</span>
+                                <h3>@group.Key.Year</h3>
+                            </div>
+
+                            <span class="count-pill">@group.Count() lễ hội</span>
+                        </div>
+
+                        <div class="festival-list-calendar">
+                            @foreach (var item in group)
+                            {
+                                <div class="festival-row">
+                                    <div class="festival-date">
+                                        <strong>@item.Start.ToString("dd")</strong>
+                                        <span>@item.Start.ToString("MMM")</span>
+                                    </div>
+
+                                    <div class="festival-info">
+                                        <h5>@item.Festival.Name</h5>
+
+                                        <div class="festival-meta">
+                                            <span>📍 @item.Festival.LocationName</span>
+                                            <span>🌸 @(item.Festival.Season?.SeasonName ?? "Festival")</span>
+                                        </div>
+
+                                        <div class="festival-range">
+                                            @FormatDateRange(item.Start, item.End)
+                                        </div>
+                                    </div>
+
+                                    <a href="/Festival/Details/@item.Festival.FestivalID"
+                                       class="detail-btn">
+                                        Chi tiết
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </section>
+
+</div>
+
+<style>
+    .calendar-page {
+        padding-bottom: 50px;
+    }
+
+    .calendar-hero {
+        display: grid;
+        grid-template-columns: 1.7fr 0.8fr;
+        gap: 28px;
+        align-items: center;
+        background: linear-gradient(135deg, #fff0f2, #ffffff);
+        border: 1px solid #ffe0e5;
+        border-radius: 32px;
+        padding: 42px;
+        margin-bottom: 36px;
+        box-shadow: 0 14px 38px rgba(0,0,0,0.07);
+    }
+
+    .calendar-badge {
+        display: inline-block;
+        background: white;
+        color: #dc3545;
+        border: 1px solid #ffd1d8;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .calendar-hero h1 {
+        font-size: 46px;
+        font-weight: 900;
+        margin-bottom: 14px;
+        color: #222;
+    }
+
+    .calendar-hero p {
+        color: #6f6f6f;
+        font-size: 18px;
+        line-height: 1.7;
+        max-width: 780px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 24px;
+    }
+
+    .hero-calendar-box {
+        background: white;
+        border-radius: 30px;
+        overflow: hidden;
+        border: 1px solid #eee;
+        box-shadow: 0 18px 40px rgba(220, 53, 69, 0.16);
+    }
+
+    .mini-calendar-top {
+        background: linear-gradient(90deg, #dc3545, #ff5b6b);
+        height: 62px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .mini-calendar-top span {
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.9;
+        }
+
+    .mini-calendar-main {
+        text-align: center;
+        padding: 28px 20px 34px;
+    }
+
+    .mini-month {
+        color: #dc3545;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .mini-day {
+        font-size: 70px;
+        font-weight: 900;
+        line-height: 1;
+        color: #222;
+        margin: 8px 0;
+    }
+
+    .mini-year {
+        color: #777;
+        font-weight: 700;
+    }
+
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        margin-bottom: 20px;
+    }
+
+        .section-heading h2 {
+            font-size: 30px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .section-heading p {
+            color: #777;
+            margin-bottom: 0;
+        }
+
+    .upcoming-section {
+        margin-bottom: 38px;
+    }
+
+    .upcoming-card {
+        height: 100%;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 26px;
+        padding: 22px;
+        display: flex;
+        gap: 18px;
+        box-shadow: 0 10px 28px rgba(0,0,0,0.07);
+        transition: 0.25s;
+    }
+
+        .upcoming-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 38px rgba(0,0,0,0.12);
+        }
+
+    .date-block {
+        width: 78px;
+        height: 86px;
+        border-radius: 22px;
+        background: #fff0f2;
+        color: #dc3545;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+        .date-block strong {
+            font-size: 30px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .date-block span {
+            font-size: 12px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+    .upcoming-content h4 {
+        font-weight: 900;
+        font-size: 21px;
+        margin-bottom: 8px;
+    }
+
+    .upcoming-content p {
+        color: #777;
+        margin-bottom: 8px;
+    }
+
+    .date-range {
+        display: inline-block;
+        background: #f8f8f8;
+        border-radius: 999px;
+        padding: 6px 12px;
+        color: #555;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .upcoming-content a {
+        display: block;
+        color: #dc3545;
+        text-decoration: none;
+        font-weight: 800;
+    }
+
+    .timeline {
+        position: relative;
+    }
+
+    .timeline-month {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 18px;
+        position: relative;
+    }
+
+    .timeline-marker {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .marker-dot {
+        width: 22px;
+        height: 22px;
+        background: #dc3545;
+        border-radius: 50%;
+        box-shadow: 0 0 0 8px #fff0f2;
+        margin-top: 28px;
+    }
+
+    .marker-line {
+        width: 3px;
+        flex: 1;
+        background: #ffd1d8;
+        margin-top: 10px;
+    }
+
+    .timeline-month:last-child .marker-line {
+        display: none;
+    }
+
+    .month-card {
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 28px;
+        padding: 26px;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+    }
+
+    .month-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .month-label {
+        color: #dc3545;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .month-card-header h3 {
+        font-size: 32px;
+        font-weight: 900;
+        margin-bottom: 0;
+    }
+
+    .count-pill {
+        background: #fff0f2;
+        color: #dc3545;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .festival-list-calendar {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .festival-row {
+        display: grid;
+        grid-template-columns: 74px 1fr auto;
+        gap: 16px;
+        align-items: center;
+        background: #fafafa;
+        border: 1px solid #eee;
+        border-radius: 22px;
+        padding: 16px;
+        transition: 0.25s;
+    }
+
+        .festival-row:hover {
+            background: #fff;
+            transform: translateX(4px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+        }
+
+    .festival-date {
+        width: 64px;
+        height: 70px;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #dc3545;
+    }
+
+        .festival-date strong {
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .festival-date span {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+    .festival-info h5 {
+        font-size: 20px;
+        font-weight: 900;
+        margin-bottom: 6px;
+    }
+
+    .festival-meta {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        color: #777;
+        margin-bottom: 6px;
+    }
+
+    .festival-range {
+        color: #555;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .detail-btn {
+        text-decoration: none;
+        background: #dc3545;
+        color: white;
+        border-radius: 999px;
+        padding: 8px 16px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+        .detail-btn:hover {
+            background: #b91c1c;
+            color: white;
+        }
+
+    @@media (max-width: 992px) {
+        .calendar-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-calendar-box {
+            max-width: 360px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .timeline-month {
+            grid-template-columns: 1fr;
+        }
+
+        .timeline-marker {
+            display: none;
+        }
+
+        .festival-row {
+            grid-template-columns: 1fr;
+        }
+
+        .festival-date {
+            width: 72px;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .calendar-hero {
+            padding: 28px 22px;
+        }
+
+            .calendar-hero h1 {
+                font-size: 34px;
+            }
+
+        .month-card {
+            padding: 20px;
+        }
+
+        .month-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+
+@functions {
+    public DateTime GetDisplayStartDate(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayStart = new DateTime(today.Year, startDate.Month, startDate.Day);
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        if (displayEnd < today)
+        {
+            displayStart = new DateTime(today.Year + 1, startDate.Month, startDate.Day);
+        }
+
+        return displayStart;
+    }
+
+    public DateTime GetDisplayEndDate(DateTime startDate, DateTime endDate)
+    {
+        var today = DateTime.Today;
+
+        var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
+
+        if (displayEnd < today)
+        {
+            displayEnd = new DateTime(today.Year + 1, endDate.Month, endDate.Day);
+        }
+
+        return displayEnd;
+    }
+
+    public string FormatDateRange(DateTime start, DateTime end)
+    {
+        if (start.Date == end.Date)
+        {
+            return start.ToString("dd/MM/yyyy");
+        }
+
+        return $"{start:dd/MM/yyyy} - {end:dd/MM/yyyy}";
+    }
+}
