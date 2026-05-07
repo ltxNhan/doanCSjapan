@@ -1,0 +1,35 @@
+@model JapanApp.Models.User
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Đăng ký</h2>
+
+<form method="post">
+
+    <div class="mb-3">
+        <input asp-for="Username"
+               class="form-control"
+               placeholder="Tên đăng nhập" />
+    </div>
+
+    <div class="mb-3">
+        <input asp-for="PasswordHash"
+               type="password"
+               class="form-control"
+               placeholder="Mật khẩu" />
+    </div>
+
+    <button class="btn btn-success">
+        Đăng ký
+    </button>
+
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <p class="text-danger mt-3">
+        @ViewBag.Error
+    </p>
+}

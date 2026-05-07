@@ -14,7 +14,6 @@ namespace JapanApp.Services
         }
 
         // 🔍 SEARCH + FILTER
-        // 🔍 SEARCH + FILTER + REMOVE DUPLICATES
         public List<Festival> Search(string keyword, int? seasonId, int? regionId)
         {
             var query = _context.Festivals
@@ -39,7 +38,7 @@ namespace JapanApp.Services
 
             var festivals = query.ToList();
 
-            // Xóa trùng khi hiển thị: cùng tên + cùng địa điểm thì chỉ lấy 1 cái
+            // 🔥 REMOVE DUPLICATES
             var uniqueFestivals = festivals
                 .GroupBy(f => new
                 {
@@ -52,6 +51,17 @@ namespace JapanApp.Services
                 .ToList();
 
             return uniqueFestivals;
+        }
+
+        // 🔎 GET BY ID
+        public Festival? GetById(int id)
+        {
+            return _context.Festivals
+                .Include(f => f.Region)
+                .Include(f => f.Season)
+                .Include(f => f.Reviews)
+                .ThenInclude(r => r.User)
+                .FirstOrDefault(f => f.FestivalID == id);
         }
 
         // ❤️ FAVORITE
@@ -94,10 +104,21 @@ namespace JapanApp.Services
             };
 
             _context.Reviews.Add(review);
+
             _context.SaveChanges();
         }
 
-        // 🧠 QUIZ
+        // ================= QUIZ =================
+
+        // 🔥 FIX LỖI GETQUIZQUESTIONS
+        public List<QuizQuestion> GetQuizQuestions()
+        {
+            return _context.QuizQuestions
+                .Include(q => q.Answers)
+                .ToList();
+        }
+
+        // 🧠 QUIZ RESULT
         public int GetSuggestedSeason(List<int> answerIds)
         {
             var result = _context.QuizAnswers
@@ -109,6 +130,7 @@ namespace JapanApp.Services
             return result?.Key ?? 1;
         }
 
+        // 🎌 FESTIVAL BY SEASON
         public List<Festival> GetBySeason(int seasonId)
         {
             return _context.Festivals
@@ -118,21 +140,11 @@ namespace JapanApp.Services
                 .ToList();
         }
 
-        // 🔎 GET BY ID
-        public Festival? GetById(int id)
-        {
-            return _context.Festivals
-                .Include(f => f.Region)
-                .Include(f => f.Season)
-                .Include(f => f.Reviews)
-                .ThenInclude(r => r.User)
-                .FirstOrDefault(f => f.FestivalID == id);
-        }
-
         // ➕ CREATE
         public void CreateFestival(Festival festival)
         {
             _context.Festivals.Add(festival);
+
             _context.SaveChanges();
         }
 
@@ -165,6 +177,7 @@ namespace JapanApp.Services
             if (festival != null)
             {
                 _context.Festivals.Remove(festival);
+
                 _context.SaveChanges();
             }
         }

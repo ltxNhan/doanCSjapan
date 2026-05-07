@@ -11,771 +11,598 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     <style>
-        html {
-            scroll-behavior: smooth;
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(120deg, #fff7f8, #f7fbff);
-            margin: 0;
-            color: #222;
+        html{
+            scroll-behavior:smooth;
         }
 
-        .top-bar {
-            background: #1f1f1f;
-            color: white;
-            text-align: center;
-            padding: 7px 0;
-            font-size: 14px;
-            font-weight: 600;
-            position: relative;
-            z-index: 50;
+        body{
+            font-family:'Poppins',sans-serif;
+            background:#f5f7fb;
+            overflow-x:hidden;
         }
 
-        .main-navbar {
-            background: linear-gradient(90deg, #b91c1c, #ef4444);
-            box-shadow: 0 10px 28px rgba(185, 28, 28, 0.25);
-            padding: 10px 0;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        /* ================= NAVBAR ================= */
+
+        .main-navbar{
+            width:100%;
+            background:linear-gradient(90deg,#c1121f,#ef233c);
+            position:sticky;
+            top:0;
+            z-index:9999;
+            box-shadow:0 4px 20px rgba(0,0,0,.15);
         }
 
-        .nav-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 18px;
+        .nav-wrapper{
+            width:100%;
+            min-height:72px;
+
+            padding:0 30px;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+
+            flex-wrap:wrap;
         }
 
-        .navbar-brand-custom {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
+        .brand-logo{
+            color:white;
+            text-decoration:none;
+            font-size:28px;
+            font-weight:800;
         }
 
-            .navbar-brand-custom:hover {
-                color: white;
+        .main-menu{
+            display:flex;
+            align-items:center;
+            gap:20px;
+            flex-wrap:wrap;
+        }
+
+        .main-menu a{
+            color:white;
+            text-decoration:none;
+            font-weight:600;
+            transition:.3s;
+        }
+
+        .main-menu a:hover{
+            transform:translateY(-2px);
+            opacity:.9;
+        }
+
+        .account-box{
+            display:flex;
+            align-items:center;
+            gap:12px;
+        }
+
+        .login-btn{
+            background:white;
+            color:#c1121f !important;
+            text-decoration:none;
+            padding:10px 20px;
+            border-radius:999px;
+            font-weight:700;
+        }
+
+        .user-badge{
+            background:rgba(255,255,255,.2);
+            color:white;
+            padding:8px 16px;
+            border-radius:999px;
+            font-weight:600;
+        }
+
+        .logout-btn{
+            color:white;
+            text-decoration:none;
+            border:1px solid rgba(255,255,255,.5);
+            padding:8px 15px;
+            border-radius:999px;
+        }
+
+        /* ================= PAGE ================= */
+
+        .full-page{
+            width:100%;
+            min-height:100vh;
+        }
+
+        .normal-page{
+            width:100%;
+            padding:30px;
+            min-height:100vh;
+        }
+
+        footer{
+            background:#111;
+            color:#ccc;
+            text-align:center;
+            padding:20px;
+        }
+
+        /* ================= ZALO FLOAT ================= */
+
+        .zalo-support-wrapper{
+            position:fixed;
+            right:25px;
+            bottom:25px;
+            z-index:99999;
+        }
+
+        .zalo-float-button{
+            width:65px;
+            height:65px;
+
+            border:none;
+            border-radius:50%;
+
+            background:white;
+
+            box-shadow:0 10px 35px rgba(0,0,0,.25);
+
+            cursor:pointer;
+
+            overflow:hidden;
+
+            transition:.3s;
+        }
+
+        .zalo-float-button:hover{
+            transform:scale(1.08);
+        }
+
+        .zalo-float-button img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+
+        .zalo-support-box{
+            position:absolute;
+            bottom:85px;
+            right:0;
+
+            width:330px;
+
+            background:white;
+
+            border-radius:20px;
+
+            overflow:hidden;
+
+            box-shadow:0 15px 40px rgba(0,0,0,.25);
+
+            display:none;
+        }
+
+        .zalo-support-box.show{
+            display:block;
+        }
+
+        .zalo-support-header{
+            background:#e11d48;
+            color:white;
+            padding:16px;
+            font-weight:700;
+
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        .zalo-close-btn{
+            background:none;
+            border:none;
+            color:white;
+            font-size:22px;
+            cursor:pointer;
+        }
+
+        .zalo-support-body{
+            padding:16px;
+        }
+
+        .zalo-support-text{
+            margin-bottom:14px;
+            color:#555;
+        }
+
+        .zalo-staff-item{
+            display:flex;
+            align-items:center;
+            gap:12px;
+
+            padding:14px;
+            border-radius:14px;
+
+            text-decoration:none;
+            color:#222;
+
+            transition:.3s;
+        }
+
+        .zalo-staff-item:hover{
+            background:#f5f5f5;
+        }
+
+        .zalo-staff-avatar{
+            width:45px;
+            height:45px;
+
+            border-radius:50%;
+
+            background:#ef233c;
+            color:white;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            font-weight:700;
+        }
+
+        .zalo-staff-info{
+            display:flex;
+            flex-direction:column;
+        }
+
+        /* ================= QR POPUP ================= */
+
+        .qr-popup{
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+
+            background:rgba(0,0,0,.6);
+
+            display:none;
+            justify-content:center;
+            align-items:center;
+
+            z-index:999999;
+        }
+
+        .qr-popup.show{
+            display:flex;
+        }
+
+        .qr-content{
+            background:white;
+            width:320px;
+
+            border-radius:20px;
+
+            padding:25px;
+
+            text-align:center;
+
+            position:relative;
+        }
+
+        .qr-content img{
+            width:220px;
+            margin-top:15px;
+            border-radius:14px;
+        }
+
+        .qr-close{
+            position:absolute;
+            right:15px;
+            top:10px;
+
+            font-size:28px;
+            cursor:pointer;
+        }
+
+        /* ================= MOBILE ================= */
+
+        @@media(max-width:768px){
+
+            .nav-wrapper{
+                padding:15px;
+                gap:15px;
+                justify-content:center;
             }
 
-        .brand-logo {
-            width: 42px;
-            height: 42px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.18);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.05;
-            font-size: 21px;
-        }
-
-            .brand-text small {
-                font-size: 11px;
-                font-weight: 500;
-                opacity: 0.85;
-                margin-top: 4px;
+            .main-menu{
+                justify-content:center;
             }
 
-        .desktop-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            flex: 1;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-            .desktop-nav > li {
-                display: flex;
-                align-items: center;
+            .normal-page{
+                padding:15px;
             }
 
-            .desktop-nav a,
-            .desktop-nav button {
-                color: rgba(255,255,255,0.96);
-                font-weight: 600;
-                font-size: 15px;
-                padding: 8px 13px;
-                border-radius: 999px;
-                text-decoration: none;
-                white-space: nowrap;
-                transition: 0.25s;
-                background: transparent;
-                border: none;
+            .zalo-support-box{
+                width:300px;
             }
 
-                .desktop-nav a:hover,
-                .desktop-nav button:hover {
-                    background: rgba(255,255,255,0.18);
-                    color: white;
-                    transform: translateY(-2px);
-                }
-
-        .dropdown-menu {
-            border: 0;
-            border-radius: 18px;
-            padding: 10px;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.16);
-            margin-top: 10px;
         }
 
-        .dropdown-item {
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-weight: 600;
-            color: #333 !important;
-        }
-
-            .dropdown-item:hover {
-                background: #fff0f2;
-                color: #dc2626 !important;
-            }
-
-        .nav-account {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .login-pill {
-            text-decoration: none;
-            background: white;
-            color: #dc2626 !important;
-            font-weight: 800;
-            border-radius: 999px;
-            padding: 9px 18px;
-            transition: 0.25s;
-            white-space: nowrap;
-        }
-
-            .login-pill:hover {
-                background: #fff1f2;
-                color: #b91c1c !important;
-                transform: translateY(-2px);
-            }
-
-        .user-pill {
-            color: white;
-            background: rgba(255,255,255,0.18);
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .logout-pill {
-            text-decoration: none;
-            color: white !important;
-            border: 1px solid rgba(255,255,255,0.45);
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-weight: 700;
-            transition: 0.25s;
-            white-space: nowrap;
-        }
-
-            .logout-pill:hover {
-                background: rgba(255,255,255,0.18);
-            }
-
-        .custom-toggler {
-            display: none;
-            width: 46px;
-            height: 42px;
-            border: 1px solid rgba(255,255,255,0.65);
-            border-radius: 13px;
-            background: rgba(255,255,255,0.08);
-            padding: 9px 10px;
-            cursor: pointer;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-            .custom-toggler span {
-                display: block;
-                width: 23px;
-                height: 3px;
-                background: white;
-                border-radius: 999px;
-            }
-
-        .mobile-slide-menu {
-            display: block;
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 88%;
-            max-width: 520px;
-            height: 100vh;
-            overflow-y: auto;
-            background: linear-gradient(160deg, #b91c1c, #ef4444);
-            box-shadow: -12px 0 30px rgba(0,0,0,0.25);
-            border-radius: 28px 0 0 28px;
-            padding: 28px 22px;
-            z-index: 9999;
-            transition: right 0.35s ease;
-        }
-
-            .mobile-slide-menu.show-menu {
-                right: 0;
-            }
-
-        .slide-menu-close {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            width: 40px;
-            height: 40px;
-            border: none;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.18);
-            color: white;
-            font-size: 30px;
-            line-height: 1;
-            cursor: pointer;
-        }
-
-        .mobile-menu-content {
-            padding-top: 48px;
-        }
-
-        .mobile-menu-title {
-            color: white;
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .mobile-menu-subtitle {
-            color: rgba(255,255,255,0.82);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .mobile-menu-section {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.16);
-            border-radius: 22px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .mobile-section-title {
-            color: rgba(255,255,255,0.85);
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .mobile-link-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .mobile-menu-link {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            color: #222;
-            background: white;
-            border-radius: 16px;
-            padding: 13px 14px;
-            font-weight: 700;
-        }
-
-            .mobile-menu-link.full {
-                grid-column: 1 / -1;
-            }
-
-        .mobile-login,
-        .mobile-logout {
-            display: inline-flex;
-            text-decoration: none;
-            border-radius: 999px;
-            padding: 11px 18px;
-            font-weight: 800;
-            margin-top: 10px;
-        }
-
-        .mobile-login {
-            background: white;
-            color: #dc2626;
-        }
-
-        .mobile-logout {
-            background: rgba(255,255,255,0.14);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.28);
-        }
-
-        .mobile-user-box {
-            width: 100%;
-            background: rgba(255,255,255,0.16);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            border-radius: 18px;
-            padding: 14px;
-            font-weight: 700;
-            margin-top: 10px;
-        }
-
-        .main-container {
-            margin-top: 30px;
-            margin-bottom: 60px;
-            position: relative;
-            z-index: 2;
-            min-height: calc(100vh - 215px);
-        }
-
-        .footer-section {
-            position: relative;
-            z-index: 2;
-            background: #1f1f1f;
-            color: #ddd;
-            padding: 18px 0;
-            margin-top: 40px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .sakura-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .sakura {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: pink;
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: fall 6s linear infinite;
-        }
-
-        @@keyframes fall {
-            0% {
-                transform: translateY(-10px) translateX(0);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
-
-        @@media (max-width: 1199px) {
-            .desktop-nav,
-            .nav-account {
-                display: none;
-            }
-
-            .custom-toggler {
-                display: flex;
-            }
-        }
-
-        @@media (max-width: 576px) {
-            .brand-text {
-                font-size: 18px;
-            }
-
-                .brand-text small {
-                    display: none;
-                }
-
-            .brand-logo {
-                width: 38px;
-                height: 38px;
-            }
-
-            .mobile-slide-menu {
-                width: 94%;
-                padding: 26px 16px;
-            }
-
-            .mobile-link-grid {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
+
 </head>
 
 <body>
 
-    <div class="sakura-container"></div>
+    <!-- ================= NAVBAR ================= -->
 
-    
     <nav class="main-navbar">
-        <div class="container-fluid px-4">
-            <div class="nav-inner">
 
-                <a class="navbar-brand-custom" href="/Home">
-                    <span class="brand-logo">JP</span>
-                    <span class="brand-text">
-                        Japan Festival
-                        <small>Explore Japanese Culture</small>
-                    </span>
-                </a>
+        <div class="nav-wrapper">
 
-                <ul class="desktop-nav">
-                    <li><a href="/Home">Trang chủ</a></li>
-                    <li><a href="/Festival">Khám phá</a></li>
-                    <li><a href="/Favorite">Theo dõi</a></li>
+            <a href="/Home" class="brand-logo">
+                🎌 Japan Festival
+            </a>
 
-                    <li class="dropdown">
-                        <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Công cụ
-                        </button>
-                        <ul class="dropdown-menu">
-                            <a class="dropdown-item" href="/Location">📍 Địa điểm</a>
-                            <a class="dropdown-item" href="/Map">🗺️ Bản đồ</a>
-                            <a class="dropdown-item" href="/Calendar">📅 Lịch vạn niên</a>
-                        </ul>
-                    </li>
+            <div class="main-menu">
 
-                    <li class="dropdown">
-                        <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            Thông tin
-                        </button>
-                        <ul class="dropdown-menu">
-                            <a class="dropdown-item" href="/About">ℹ️ Giới thiệu</a>
-                            <a class="dropdown-item" href="/Contact">📩 Liên hệ</a>
-                        </ul>
-                    </li>
-                </ul>
+                <a href="/Home">🏠 Trang chủ</a>
 
-                <div class="nav-account">
-                    @if (Context.Session.GetString("Username") == null)
-                    {
-                        <a class="login-pill" href="/Account/Login">🔑 Login</a>
-                    }
-                    else
-                    {
-                        <div class="user-pill">
-                            👤 @Context.Session.GetString("Username")
-                            <small>@Context.Session.GetString("Role")</small>
-                        </div>
+                <a href="/Festival">🎎 Lễ hội</a>
 
-                        <a class="logout-pill" href="/Account/Logout">Logout</a>
-                    }
-                </div>
+                @if (Context.Session.GetString("Username") != null)
+                {
+                    <a href="/Favorite">❤️ Theo dõi</a>
+                    <a href="/Map">🗺️ Bản đồ</a>
+                    <a href="/Quiz">🧠 Quiz</a>
+                }
 
-                <button class="custom-toggler" type="button" onclick="toggleSlideMenu()" aria-label="Open menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                @if (Context.Session.GetString("Role") == "Admin")
+                {
+                    <a href="/Festival/Create">➕ Quản lý lễ hội</a>
+                    <a href="/Quiz/Admin">❓ Quản lý Quiz</a>
+                }
 
             </div>
+
+            <div class="account-box">
+
+                @if (Context.Session.GetString("Username") == null)
+                {
+                    <a href="/Account/Login" class="login-btn">
+                        🔑 Login
+                    </a>
+                }
+                else
+                {
+                    <div class="user-badge">
+                        👤 @Context.Session.GetString("Username")
+                        (@Context.Session.GetString("Role"))
+                    </div>
+
+                    <a href="/Account/Logout" class="logout-btn">
+                        Logout
+                    </a>
+                }
+
+            </div>
+
         </div>
+
     </nav>
 
-    <div class="mobile-slide-menu" id="mainNavbar">
-        <button type="button" class="slide-menu-close" onclick="toggleSlideMenu()">×</button>
+    <!-- ================= BODY ================= -->
 
-        <div class="mobile-menu-content">
-            <div class="mobile-menu-title">Điều hướng</div>
-            <div class="mobile-menu-subtitle">Chọn trang bạn muốn truy cập</div>
-
-            <div class="mobile-menu-section">
-                <div class="mobile-section-title">Trang chính</div>
-                <div class="mobile-link-grid">
-                    <a class="mobile-menu-link" href="/Home">🏠 Trang chủ</a>
-                    <a class="mobile-menu-link" href="/Festival">🎌 Khám phá</a>
-                    <a class="mobile-menu-link full" href="/Favorite">❤️ Theo dõi</a>
-                </div>
-            </div>
-
-            <div class="mobile-menu-section">
-                <div class="mobile-section-title">Công cụ</div>
-                <div class="mobile-link-grid">
-                    <a class="mobile-menu-link" href="/Location">📍 Địa điểm</a>
-                    <a class="mobile-menu-link" href="/Map">🗺️ Bản đồ</a>
-                    <a class="mobile-menu-link full" href="/Calendar">📅 Lịch vạn niên</a>
-                </div>
-            </div>
-
-            <div class="mobile-menu-section">
-                <div class="mobile-section-title">Thông tin</div>
-                <div class="mobile-link-grid">
-                    <a class="mobile-menu-link" href="/About">ℹ️ Giới thiệu</a>
-                    <a class="mobile-menu-link" href="/Contact">📩 Liên hệ</a>
-                </div>
-            </div>
-
-            @if (Context.Session.GetString("Username") == null)
-            {
-                <a class="mobile-login" href="/Account/Login">🔑 Login</a>
-            }
-            else
-            {
-                <div class="mobile-user-box">
-                    👤 @Context.Session.GetString("Username")
-                    <small>@Context.Session.GetString("Role")</small>
-                </div>
-
-                <a class="mobile-logout" href="/Account/Logout">Logout</a>
-            }
-        </div>
-    </div>
     @{
-        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
     }
 
-    @if (currentController == "Home")
+    @if (controller == "Home")
     {
-        <div class="main-container home-container">
+        <div class="full-page">
             @RenderBody()
         </div>
     }
     else
     {
-        <div class="container main-container">
+        <div class="normal-page">
             @RenderBody()
         </div>
     }
 
-    <footer class="footer-section">
-        <div class="container">
-            © 2026 Japan Festival - Website khám phá lễ hội Nhật Bản
-        </div>
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+        © 2026 Japan Festival - Khám phá văn hóa Nhật Bản
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ================= ZALO ================= -->
 
-    <script>
-        const sakuraContainer = document.querySelector('.sakura-container');
-
-        for (let i = 0; i < 25; i++) {
-            let sakura = document.createElement('div');
-            sakura.classList.add('sakura');
-            sakura.style.left = Math.random() * 100 + 'vw';
-            sakura.style.animationDuration = (5 + Math.random() * 5) + 's';
-            sakura.style.animationDelay = Math.random() * 5 + 's';
-            sakura.style.opacity = Math.random();
-            sakuraContainer.appendChild(sakura);
-        }
-    </script>
-
-    <script>
-        function toggleSlideMenu() {
-            const menu = document.getElementById("mainNavbar");
-            menu.classList.toggle("show-menu");
-        }
-
-        document.addEventListener("click", function (e) {
-            const menu = document.getElementById("mainNavbar");
-            const toggler = document.querySelector(".custom-toggler");
-
-            if (!menu.contains(e.target) && !toggler.contains(e.target)) {
-                menu.classList.remove("show-menu");
-            }
-        });
-
-        document.querySelectorAll("#mainNavbar a").forEach(function (link) {
-            link.addEventListener("click", function () {
-                document.getElementById("mainNavbar").classList.remove("show-menu");
-            });
-        });
-    </script>
-
-    @await RenderSectionAsync("Scripts", required: false)
-    <!-- ZALO FLOATING SUPPORT -->
     <div class="zalo-support-wrapper">
-        <!-- Hộp danh sách hỗ trợ -->
+
+        <!-- BOX -->
+
         <div class="zalo-support-box" id="zaloSupportBox">
+
             <div class="zalo-support-header">
+
                 <span>Hỗ trợ qua Zalo</span>
-                <button type="button" class="zalo-close-btn" onclick="toggleZaloBox()">×</button>
+
+                <button type="button"
+                        class="zalo-close-btn"
+                        onclick="toggleZaloBox()">
+                    ×
+                </button>
+
             </div>
 
             <div class="zalo-support-body">
+
                 <p class="zalo-support-text">
-                    Chọn nhân viên hỗ trợ để liên hệ nhanh qua Zalo:
+                    Chọn nhân viên hỗ trợ:
                 </p>
 
-                <!-- NHÂN VIÊN 1 -->
-                <a href="https://zalo.me/0909123456" target="_blank"
+                <!-- PERSON 1 -->
+
+                <a href="#"
                    class="zalo-staff-item"
                    onclick="openQR(event,'nhan')">
+
                     <div class="zalo-staff-avatar">A</div>
+
                     <div class="zalo-staff-info">
                         <strong>Xuân Nhạn</strong>
-                        <span>Tư vấn lễ hội & lịch trình</span>
+                        <span>Tư vấn lễ hội</span>
                     </div>
+
                 </a>
 
-                <!-- NHÂN VIÊN 2 -->
-                <a href="https://zalo.me/0911222333" target="_blank"
+                <!-- PERSON 2 -->
+
+                <a href="#"
                    class="zalo-staff-item"
                    onclick="openQR(event,'binh')">
+
                     <div class="zalo-staff-avatar">B</div>
+
                     <div class="zalo-staff-info">
                         <strong>Trần Bình</strong>
                         <span>Hỗ trợ vé máy bay</span>
                     </div>
+
                 </a>
 
-                <!-- NHÂN VIÊN 3 -->
-                <a href="https://chat.zalo.me/0335577404" target="_blank"
+                <!-- PERSON 3 -->
+
+                <a href="#"
                    class="zalo-staff-item"
                    onclick="openQR(event,'nha')">
+
                     <div class="zalo-staff-avatar">C</div>
+
                     <div class="zalo-staff-info">
                         <strong>Đức Nhã</strong>
-                        <span>Hỗ trợ điểm đến & khách sạn</span>
+                        <span>Hỗ trợ khách sạn</span>
                     </div>
+
                 </a>
+
             </div>
+
         </div>
 
-        <!-- Nút icon nổi -->
-        <button type="button" class="zalo-float-button" onclick="toggleZaloBox()">
-            <img src="~/images/zalo-icon.png" alt="Zalo" />
+        <!-- FLOAT BUTTON -->
+
+        <button type="button"
+                class="zalo-float-button"
+                onclick="toggleZaloBox()">
+
+            <img src="/images/zalo-icon.png" />
+
         </button>
+
     </div>
 
     <!-- ================= QR POPUP ================= -->
+
     <div class="qr-popup" id="qrPopup">
+
         <div class="qr-content">
-            <span class="qr-close" onclick="closeQR()">×</span>
-            <h5>Quét mã QR để liên hệ</h5>
 
-            <!-- Ảnh QR (bạn tự thay) -->
-            <img id="qrImage" src="~/images/qr-default.png" />
+            <span class="qr-close"
+                  onclick="closeQR()">
+                ×
+            </span>
 
-            <!-- Nút chat trực tiếp -->
-            <a id="qrLink" href="#" target="_blank" class="btn btn-danger mt-3">
+            <h4>Quét mã QR để liên hệ</h4>
+
+            <img id="qrImage"
+                 src="/images/qr-default.png" />
+
+            <a id="qrLink"
+               href="#"
+               target="_blank"
+               class="btn btn-danger mt-3">
+
                 Chat trực tiếp
+
             </a>
+
         </div>
+
     </div>
 
-    <!-- ================= CSS ================= -->
-    <style>
-        .qr-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
-
-            .qr-popup.show {
-                display: flex;
-            }
-
-        .qr-content {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            width: 300px;
-            position: relative;
-        }
-
-            .qr-content img {
-                width: 200px;
-                margin-top: 10px;
-            }
-
-        .qr-close {
-            position: absolute;
-            right: 10px;
-            top: 5px;
-            font-size: 22px;
-            cursor: pointer;
-        }
-    </style>
-
     <!-- ================= JS ================= -->
+
     <script>
-        function toggleZaloBox() {
-            const box = document.getElementById("zaloSupportBox");
-            box.classList.toggle("show");
+
+        function toggleZaloBox(){
+
+            document
+                .getElementById("zaloSupportBox")
+                .classList
+                .toggle("show");
+
         }
 
-        // click ngoài đóng box zalo
-        document.addEventListener("click", function (event) {
-            const box = document.getElementById("zaloSupportBox");
-            const wrapper = document.querySelector(".zalo-support-wrapper");
+        function openQR(event,staff){
 
-            if (!wrapper.contains(event.target)) {
-                box.classList.remove("show");
-            }
-        });
-
-        // ===== QR FUNCTION =====
-        function openQR(event, staff) {
-            event.preventDefault(); // chặn mở link ngay
+            event.preventDefault();
 
             const popup = document.getElementById("qrPopup");
             const img = document.getElementById("qrImage");
             const link = document.getElementById("qrLink");
 
-            if (staff === "nhan") {
-                img.src = "/images/qr-nhan.jpg";
-                link.href = "https://chat.zalo.me";
+            if(staff==="nhan"){
+
+                img.src="/images/qr-nhan.jpg";
+                link.href="https://chat.zalo.me/";
+
             }
-            else if (staff === "binh") {
-                img.src = "/images/qr-binh.jpg";
-                link.href = "https://chat.zalo.me";
+            else if(staff==="binh"){
+
+                img.src="/images/qr-binh.jpg";
+                link.href="https://chat.zalo.me/";
+
             }
-            else if (staff === "nha") {
-                img.src = "/images/qr-nha.jpg";
-                link.href = "https://chat.zalo.me";
+            else if(staff==="nha"){
+
+                img.src="/images/qr-nha.jpg";
+                link.href="https://chat.zalo.me/";
+
             }
 
             popup.classList.add("show");
+
         }
 
-        function closeQR() {
-            document.getElementById("qrPopup").classList.remove("show");
+        function closeQR(){
+
+            document
+                .getElementById("qrPopup")
+                .classList
+                .remove("show");
+
         }
 
-        // click ngoài popup để đóng
-        document.getElementById("qrPopup").addEventListener("click", function (e) {
-            if (e.target === this) {
-                closeQR();
-            }
-        });
+        document
+            .getElementById("qrPopup")
+            .addEventListener("click",function(e){
+
+                if(e.target===this){
+
+                    closeQR();
+
+                }
+
+            });
+
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>

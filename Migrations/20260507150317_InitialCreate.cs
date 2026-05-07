@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace JapanApp.Migrations
 {
     /// <inheritdoc />
@@ -15,9 +17,9 @@ namespace JapanApp.Migrations
                 name: "QuizQuestions",
                 columns: table => new
                 {
-                    QuestionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionText = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    QuestionID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    QuestionText = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,9 +30,9 @@ namespace JapanApp.Migrations
                 name: "Regions",
                 columns: table => new
                 {
-                    RegionID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RegionName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RegionID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RegionName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -41,9 +43,9 @@ namespace JapanApp.Migrations
                 name: "Seasons",
                 columns: table => new
                 {
-                    SeasonID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SeasonName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SeasonID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SeasonName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,11 +56,11 @@ namespace JapanApp.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    UserID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UserID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Username = table.Column<string>(type: "TEXT", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
+                    Role = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,16 +71,18 @@ namespace JapanApp.Migrations
                 name: "Festivals",
                 columns: table => new
                 {
-                    FestivalID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LocationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RegionID = table.Column<int>(type: "int", nullable: false),
-                    SeasonID = table.Column<int>(type: "int", nullable: false)
+                    FestivalID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    LocationName = table.Column<string>(type: "TEXT", nullable: false),
+                    Latitude = table.Column<double>(type: "REAL", nullable: false),
+                    Longitude = table.Column<double>(type: "REAL", nullable: false),
+                    RegionID = table.Column<int>(type: "INTEGER", nullable: false),
+                    SeasonID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,12 +105,12 @@ namespace JapanApp.Migrations
                 name: "QuizAnswers",
                 columns: table => new
                 {
-                    AnswerID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionID = table.Column<int>(type: "int", nullable: false),
-                    AnswerText = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SuggestSeasonID = table.Column<int>(type: "int", nullable: false),
-                    SeasonID = table.Column<int>(type: "int", nullable: false)
+                    AnswerID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    QuestionID = table.Column<int>(type: "INTEGER", nullable: false),
+                    AnswerText = table.Column<string>(type: "TEXT", nullable: false),
+                    SuggestSeasonID = table.Column<int>(type: "INTEGER", nullable: false),
+                    SeasonID = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,9 +133,9 @@ namespace JapanApp.Migrations
                 name: "Favorites",
                 columns: table => new
                 {
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    FestivalID = table.Column<int>(type: "int", nullable: false),
-                    SavedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
+                    FestivalID = table.Column<int>(type: "INTEGER", nullable: false),
+                    SavedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -154,13 +158,13 @@ namespace JapanApp.Migrations
                 name: "Reviews",
                 columns: table => new
                 {
-                    ReviewID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    FestivalID = table.Column<int>(type: "int", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReviewDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ReviewID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserID = table.Column<int>(type: "INTEGER", nullable: false),
+                    FestivalID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Rating = table.Column<int>(type: "INTEGER", nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", nullable: false),
+                    ReviewDate = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -177,6 +181,15 @@ namespace JapanApp.Migrations
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "UserID", "PasswordHash", "Role", "Username" },
+                values: new object[,]
+                {
+                    { 1, "123", "Admin", "admin" },
+                    { 2, "123", "User", "user" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -210,10 +223,9 @@ namespace JapanApp.Migrations
                 column: "FestivalID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_UserID_FestivalID",
+                name: "IX_Reviews_UserID",
                 table: "Reviews",
-                columns: new[] { "UserID", "FestivalID" },
-                unique: true);
+                column: "UserID");
         }
 
         /// <inheritdoc />

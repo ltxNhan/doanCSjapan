@@ -1,9 +1,285 @@
-<h2>Login</h2>
+@{
+    ViewData["Title"] = "Login";
+}
 
-<form method="post">
-    <input name="username" placeholder="Username" class="form-control mb-2" />
-    <input name="password" type="password" placeholder="Password" class="form-control mb-2" />
-    <button class="btn btn-primary">Login</button>
-</form>
+<style>
+    .login-page {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-<p style="color:red">@ViewBag.Error</p>
+    /* Background glow */
+    .login-bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.35;
+        z-index: 0;
+    }
+
+    .circle1 {
+        width: 300px;
+        height: 300px;
+        background: #ff4d6d;
+        top: -60px;
+        left: -80px;
+    }
+
+    .circle2 {
+        width: 350px;
+        height: 350px;
+        background: #4f46e5;
+        bottom: -120px;
+        right: -120px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 460px;
+        background: rgba(255,255,255,0.18);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow:
+            0 10px 40px rgba(0,0,0,0.18),
+            inset 0 1px 1px rgba(255,255,255,0.3);
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+    }
+
+    .login-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,255,255,0.16),
+                rgba(255,255,255,0.02)
+            );
+        z-index: -1;
+    }
+
+    .login-logo {
+        width: 95px;
+        height: 95px;
+        border-radius: 28px;
+        margin: auto;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg,#ef4444,#dc2626);
+        box-shadow: 0 12px 30px rgba(220,38,38,0.35);
+        animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    @@keyframes floatLogo {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .login-title {
+        text-align: center;
+        font-size: 34px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: #6b7280;
+        margin-bottom: 30px;
+        font-size: 15px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .modern-input {
+        border: none;
+        border-radius: 18px;
+        padding: 15px 18px;
+        background: rgba(255,255,255,0.65);
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+        transition: 0.25s;
+        font-size: 15px;
+    }
+
+    .modern-input:focus {
+        background: white;
+        box-shadow:
+            0 0 0 4px rgba(239,68,68,0.18);
+        outline: none;
+    }
+
+    .login-btn {
+        width: 100%;
+        border: none;
+        border-radius: 18px;
+        padding: 15px;
+        font-size: 17px;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg,#ef4444,#b91c1c);
+        transition: 0.25s;
+        margin-top: 10px;
+        box-shadow: 0 10px 25px rgba(220,38,38,0.28);
+    }
+
+    .login-btn:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 14px 35px rgba(220,38,38,0.38);
+    }
+
+    .error-box {
+        background: rgba(239,68,68,0.12);
+        color: #dc2626;
+        border: 1px solid rgba(239,68,68,0.2);
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 18px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .demo-box {
+        margin-top: 25px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.5);
+        padding: 18px;
+        text-align: center;
+    }
+
+    .demo-title {
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: #111827;
+    }
+
+    .demo-item {
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .login-footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .login-footer a {
+        color: #dc2626;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @@media(max-width:576px) {
+        .login-card {
+            padding: 28px;
+            border-radius: 24px;
+        }
+
+        .login-title {
+            font-size: 28px;
+        }
+    }
+</style>
+
+<div class="login-page">
+
+    <div class="login-bg-circle circle1"></div>
+    <div class="login-bg-circle circle2"></div>
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            JP
+        </div>
+
+        <div class="login-title">
+            Welcome Back
+        </div>
+
+        <div class="login-subtitle">
+            Đăng nhập để khám phá lễ hội Nhật Bản
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post">
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Username
+                </label>
+
+                <input
+                    name="username"
+                    class="form-control modern-input"
+                    placeholder="Nhập username..." />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control modern-input"
+                    placeholder="Nhập mật khẩu..." />
+            </div>
+
+            <button class="login-btn">
+                🔑 Đăng nhập
+            </button>
+
+        </form>
+
+        <div class="demo-box">
+
+            <div class="demo-title">
+                Tài khoản Demo
+            </div>
+
+            <div class="demo-item">
+                👑 Admin:
+                <b>admin / 123</b>
+            </div>
+
+            <div class="demo-item">
+                👤 User:
+                <b>user / 123</b>
+            </div>
+
+        </div>
+
+        <div class="login-footer">
+            Japan Festival Explorer 🇯🇵
+        </div>
+
+    </div>
+</div>

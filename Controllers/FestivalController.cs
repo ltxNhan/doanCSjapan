@@ -13,45 +13,25 @@ namespace JapanApp.Controllers
             _service = service;
         }
 
-        // 📌 LIST + SEARCH + FILTER
+        // 📌 DANH SÁCH
         public IActionResult Index(string keyword, int? seasonId, int? regionId)
         {
             var data = _service.Search(keyword, seasonId, regionId);
 
-            ViewBag.Keyword = keyword;
-            ViewBag.SeasonId = seasonId;
-            ViewBag.RegionId = regionId;
-            ViewBag.FilterTitle = GetFilterTitle(seasonId, regionId);
-
             return View(data);
         }
 
-        // 📌 TIÊU ĐỀ THEO BỘ LỌC
-        private string GetFilterTitle(int? seasonId, int? regionId)
-        {
-            if (seasonId.HasValue)
-            {
-                return seasonId.Value switch
-                {
-                    1 => "🌸 Lễ hội mùa xuân",
-                    2 => "🎆 Lễ hội mùa hè",
-                    3 => "🍁 Lễ hội mùa thu",
-                    4 => "❄️ Lễ hội mùa đông",
-                    _ => "🎌 Explore Japan Festivals"
-                };
-            }
-
-            if (regionId.HasValue)
-            {
-                return "📍 Lễ hội theo địa điểm";
-            }
-
-            return "🎌 Explore Japan Festivals";
-        }
-
-        // 📌 DETAILS
+        // 📌 CHI TIẾT
         public IActionResult Details(int id)
         {
+            // 🔒 CHƯA LOGIN -> KHÔNG CHO XEM
+            if (HttpContext.Session.GetString("Username") == null)
+            {
+                TempData["Error"] = "Bạn cần đăng nhập";
+
+                return RedirectToAction("Login", "Account");
+            }
+
             var festival = _service.GetById(id);
 
             if (festival == null)
@@ -62,40 +42,20 @@ namespace JapanApp.Controllers
             return View(festival);
         }
 
-        // ❤️ FAVORITE - Không cần đăng nhập vẫn theo dõi được
+        // ❤️ FAVORITE
         public IActionResult AddFavorite(int id)
         {
-            var userIdStr = HttpContext.Session.GetString("UserID");
-
-            // Nếu đã đăng nhập thì lưu vào database
-            if (userIdStr != null)
+            // 🔒 CHƯA LOGIN
+            if (HttpContext.Session.GetString("Username") == null)
             {
-                int userId = int.Parse(userIdStr);
-                _service.AddFavorite(userId, id);
+                TempData["Error"] = "Bạn cần đăng nhập";
 
-                return RedirectToAction("Index", "Favorite");
+                return RedirectToAction("Login", "Account");
             }
 
-            // Nếu chưa đăng nhập thì lưu tạm bằng Session
-            var guestFavoriteJson = HttpContext.Session.GetString("GuestFavorites");
+            int userId = int.Parse(HttpContext.Session.GetString("UserID"));
 
-            List<int> guestFavorites;
-
-            if (string.IsNullOrEmpty(guestFavoriteJson))
-            {
-                guestFavorites = new List<int>();
-            }
-            else
-            {
-                guestFavorites = JsonSerializer.Deserialize<List<int>>(guestFavoriteJson) ?? new List<int>();
-            }
-
-            if (!guestFavorites.Contains(id))
-            {
-                guestFavorites.Add(id);
-            }
-
-            HttpContext.Session.SetString("GuestFavorites", JsonSerializer.Serialize(guestFavorites));
+            _service.AddFavorite(userId, id);
 
             return RedirectToAction("Index", "Favorite");
         }
@@ -104,23 +64,27 @@ namespace JapanApp.Controllers
         [HttpPost]
         public IActionResult AddReview(int festivalId, int rating, string comment)
         {
-            var userIdStr = HttpContext.Session.GetString("UserID");
-
-            if (userIdStr == null)
+            // 🔒 CHƯA LOGIN
+            if (HttpContext.Session.GetString("Username") == null)
             {
+                TempData["Error"] = "Bạn cần đăng nhập";
+
                 return RedirectToAction("Login", "Account");
             }
 
-            int userId = int.Parse(userIdStr);
+            int userId = int.Parse(HttpContext.Session.GetString("UserID"));
 
             _service.AddReview(userId, festivalId, rating, comment);
 
             return RedirectToAction("Details", new { id = festivalId });
         }
 
-        // 🔥 ADMIN: CREATE
+        // ================= ADMIN =================
+
+        // CREATE
         public IActionResult Create()
         {
+            // 🔒 CHỈ ADMIN
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return RedirectToAction("Index");
@@ -132,18 +96,21 @@ namespace JapanApp.Controllers
         [HttpPost]
         public IActionResult Create(JapanApp.Models.Festival model)
         {
+            // 🔒 CHỈ ADMIN
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return RedirectToAction("Index");
             }
 
             _service.CreateFestival(model);
+
             return RedirectToAction("Index");
         }
 
-        // 🔥 ADMIN: EDIT
+        // EDIT
         public IActionResult Edit(int id)
         {
+            // 🔒 CHỈ ADMIN
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return RedirectToAction("Index");
@@ -151,35 +118,34 @@ namespace JapanApp.Controllers
 
             var festival = _service.GetById(id);
 
-            if (festival == null)
-            {
-                return NotFound();
-            }
-
             return View(festival);
         }
 
         [HttpPost]
         public IActionResult Edit(JapanApp.Models.Festival model)
         {
+            // 🔒 CHỈ ADMIN
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return RedirectToAction("Index");
             }
 
             _service.UpdateFestival(model);
+
             return RedirectToAction("Index");
         }
 
-        // 🔥 ADMIN: DELETE
+        // DELETE
         public IActionResult Delete(int id)
         {
+            // 🔒 CHỈ ADMIN
             if (HttpContext.Session.GetString("Role") != "Admin")
             {
                 return RedirectToAction("Index");
             }
 
             _service.DeleteFestival(id);
+
             return RedirectToAction("Index");
         }
     }

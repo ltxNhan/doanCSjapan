@@ -5,10 +5,13 @@ namespace JapanApp.Models
         public int UserID { get; set; }
 
         public string Username { get; set; } = string.Empty;
+
         public string PasswordHash { get; set; } = string.Empty;
+
         public string Role { get; set; } = "User";
 
-        public List<Review> Reviews { get; set; } = new List<Review>();
-        public List<Favorite> Favorites { get; set; } = new List<Favorite>();
+        public List<Review> Reviews { get; set; } = new();
+
+        public List<Favorite> Favorites { get; set; } = new();
     }
 }

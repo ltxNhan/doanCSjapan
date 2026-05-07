@@ -4,23 +4,32 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Đăng ký services TRƯỚC build
+// MVC
 builder.Services.AddControllersWithViews();
 
+// SQLite
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
+// Service
 builder.Services.AddScoped<FestivalService>();
 
-// 🔥 SESSION phải ở đây (TRƯỚC build)
-builder.Services.AddSession();
+// Session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
 app.UseStaticFiles();
+
 app.UseRouting();
 
-// 🔥 SESSION phải ở đây
 app.UseSession();
 
 app.MapControllerRoute(

@@ -2,41 +2,84 @@ using JapanApp.Data;
 using JapanApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
-public class AccountController : Controller
+namespace JapanApp.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public AccountController(AppDbContext context)
+    public class AccountController : Controller
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public IActionResult Login(string username, string password)
-    {
-        var user = _context.Users
-            .FirstOrDefault(u => u.Username == username && u.PasswordHash == password);
-
-        if (user != null)
+        public AccountController(AppDbContext context)
         {
-            HttpContext.Session.SetString("Username", user.Username);
-            HttpContext.Session.SetString("Role", user.Role);
-
-            return RedirectToAction("Index", "Festival");
+            _context = context;
         }
 
-        ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
-        return View();
-    }
+        // ================= LOGIN =================
 
-    public IActionResult Logout()
-    {
-        HttpContext.Session.Clear();
-        return RedirectToAction("Index", "Festival");
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(string username, string password)
+        {
+            var user = _context.Users
+                .FirstOrDefault(u =>
+                    u.Username == username &&
+                    u.PasswordHash == password);
+
+            if (user == null)
+            {
+                ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
+                return View();
+            }
+
+            HttpContext.Session.SetString("Username", user.Username);
+            HttpContext.Session.SetString("Role", user.Role);
+            HttpContext.Session.SetInt32("UserID", user.UserID);
+
+            if (user.Role == "Admin")
+            {
+                return RedirectToAction("Index", "Festival");
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // ================= REGISTER =================
+
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(User model)
+        {
+            var checkUser = _context.Users
+                .FirstOrDefault(u => u.Username == model.Username);
+
+            if (checkUser != null)
+            {
+                ViewBag.Error = "Tài khoản đã tồn tại";
+                return View();
+            }
+
+            model.Role = "User";
+
+            _context.Users.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction("Login");
+        }
+
+        // ================= LOGOUT =================
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+
+            return RedirectToAction("Index", "Home");
+        }
     }
 }
