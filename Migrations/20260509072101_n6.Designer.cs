@@ -4,6 +4,7 @@ using JapanApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JapanApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260509072101_n6")]
+    partial class n6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,15 +106,20 @@ namespace JapanApp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Points")
+                    b.Property<int>("QuestionID")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuestionID")
+                    b.Property<int>("SeasonID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SuggestSeasonID")
                         .HasColumnType("int");
 
                     b.HasKey("AnswerID");
 
                     b.HasIndex("QuestionID");
+
+                    b.HasIndex("SeasonID");
 
                     b.ToTable("QuizAnswers");
                 });
@@ -131,35 +139,6 @@ namespace JapanApp.Migrations
                     b.HasKey("QuestionID");
 
                     b.ToTable("QuizQuestions");
-                });
-
-            modelBuilder.Entity("JapanApp.Models.QuizResult", b =>
-                {
-                    b.Property<int>("QuizResultID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuizResultID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SuggestedSeasonID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TotalScore")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.HasKey("QuizResultID");
-
-                    b.HasIndex("SuggestedSeasonID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("QuizResults");
                 });
 
             modelBuilder.Entity("JapanApp.Models.Region", b =>
@@ -316,26 +295,15 @@ namespace JapanApp.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("JapanApp.Models.QuizResult", b =>
-                {
-                    b.HasOne("JapanApp.Models.Season", "SuggestedSeason")
+                    b.HasOne("JapanApp.Models.Season", "Season")
                         .WithMany()
-                        .HasForeignKey("SuggestedSeasonID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("JapanApp.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("SeasonID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SuggestedSeason");
+                    b.Navigation("Question");
 
-                    b.Navigation("User");
+                    b.Navigation("Season");
                 });
 
             modelBuilder.Entity("JapanApp.Models.Review", b =>

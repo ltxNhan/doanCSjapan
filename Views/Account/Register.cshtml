@@ -4,32 +4,297 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>Đăng ký</h2>
+<style>
+    .login-page {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-<form method="post">
+    /* Background glow */
+    .login-bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(70px);
+        opacity: 0.35;
+        z-index: 0;
+    }
 
-    <div class="mb-3">
-        <input asp-for="Username"
-               class="form-control"
-               placeholder="Tên đăng nhập" />
+    .circle1 {
+        width: 300px;
+        height: 300px;
+        background: #ef233c; /* Red */
+        top: -60px;
+        left: -80px;
+    }
+
+    .circle2 {
+        width: 350px;
+        height: 350px;
+        background: #ff4d6d; /* Pink */
+        bottom: -120px;
+        right: -120px;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 480px;
+        background: rgba(255,255,255,0.18);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow:
+            0 10px 40px rgba(0,0,0,0.18),
+            inset 0 1px 1px rgba(255,255,255,0.3);
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+    }
+
+    .login-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,255,255,0.16),
+                rgba(255,255,255,0.02)
+            );
+        z-index: -1;
+    }
+
+    .login-logo {
+        width: 95px;
+        height: 95px;
+        border-radius: 28px;
+        margin: auto;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 42px;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg,#ef233c,#ff4d6d);
+        box-shadow: 0 12px 30px rgba(239, 35, 60, 0.35);
+        animation: floatLogo 3s ease-in-out infinite;
+    }
+
+    @@keyframes floatLogo {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .login-title {
+        text-align: center;
+        font-size: 34px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+        text-align: center;
+        color: #6b7280;
+        margin-bottom: 30px;
+        font-size: 15px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .modern-input {
+        border: none;
+        border-radius: 18px;
+        padding: 14px 18px;
+        background: rgba(255,255,255,0.65);
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+        transition: 0.25s;
+        font-size: 15px;
+    }
+
+    .modern-input:focus {
+        background: white;
+        box-shadow:
+            0 0 0 4px rgba(239, 35, 60, 0.18);
+        outline: none;
+    }
+
+    .login-btn {
+        width: 100%;
+        border: none;
+        border-radius: 18px;
+        padding: 15px;
+        font-size: 17px;
+        font-weight: 800;
+        color: white;
+        background: linear-gradient(135deg,#ef233c,#d90429);
+        transition: 0.25s;
+        margin-top: 15px;
+        box-shadow: 0 10px 25px rgba(239, 35, 60, 0.28);
+    }
+
+    .login-btn:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 14px 35px rgba(239, 35, 60, 0.38);
+    }
+
+    .error-box {
+        background: rgba(239,68,68,0.12);
+        color: #dc2626;
+        border: 1px solid rgba(239,68,68,0.2);
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 18px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .login-footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .login-footer a {
+        color: #ef233c;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .login-footer a:hover {
+        color: #d90429;
+        text-decoration: underline;
+    }
+
+    @@media(max-width:576px) {
+        .login-card {
+            padding: 28px;
+            border-radius: 24px;
+        }
+
+        .login-title {
+            font-size: 28px;
+        }
+    }
+</style>
+
+<div class="login-page">
+
+    <div class="login-bg-circle circle1"></div>
+    <div class="login-bg-circle circle2"></div>
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            <span style="font-size: 38px">🌸</span>
+        </div>
+
+        <div class="login-title">
+            Đăng Ký
+        </div>
+
+        <div class="login-subtitle">
+            Tham gia cộng đồng khám phá Nhật Bản
+        </div>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="error-box">
+                @ViewBag.Error
+            </div>
+        }
+
+        <form method="post" id="registerForm">
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Tên tài khoản
+                </label>
+                <input
+                    asp-for="Username"
+                    class="form-control modern-input"
+                    placeholder="Nhập tên đăng nhập..." required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Email
+                </label>
+                <input
+                    type="email"
+                    name="Email"
+                    class="form-control modern-input"
+                    placeholder="Nhập email..." required />
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        Mật khẩu
+                    </label>
+                    <input
+                        asp-for="PasswordHash"
+                        type="password"
+                        id="password"
+                        class="form-control modern-input"
+                        placeholder="Nhập mật khẩu..." required />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        Xác nhận mật khẩu
+                    </label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="ConfirmPassword"
+                        class="form-control modern-input"
+                        placeholder="Nhập lại mật khẩu..." required />
+                </div>
+            </div>
+
+            <p id="passwordError" class="text-danger" style="display:none; font-size:13px; font-weight:600; text-align:center;">
+                Mật khẩu xác nhận không khớp!
+            </p>
+
+            <button type="submit" class="login-btn">
+                ✨ Đăng ký ngay
+            </button>
+
+        </form>
+
+        <div class="login-footer">
+            Đã có tài khoản? <a href="/Account/Login">Đăng nhập ngay</a>
+        </div>
+
     </div>
+</div>
 
-    <div class="mb-3">
-        <input asp-for="PasswordHash"
-               type="password"
-               class="form-control"
-               placeholder="Mật khẩu" />
-    </div>
-
-    <button class="btn btn-success">
-        Đăng ký
-    </button>
-
-</form>
-
-@if (ViewBag.Error != null)
-{
-    <p class="text-danger mt-3">
-        @ViewBag.Error
-    </p>
-}
+<script>
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+        var pwd = document.getElementById("password").value;
+        var cpwd = document.getElementById("confirmPassword").value;
+        
+        if (pwd !== cpwd) {
+            e.preventDefault();
+            document.getElementById("passwordError").style.display = "block";
+        } else {
+            document.getElementById("passwordError").style.display = "none";
+        }
+    });
+</script>

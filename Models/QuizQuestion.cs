@@ -4,11 +4,11 @@ namespace JapanApp.Models
 {
     public class QuizQuestion
     {
-        [Key] // ⭐ BẮT BUỘC
+        [Key]
         public int QuestionID { get; set; }
 
-        public string QuestionText { get; set; }
+        public string QuestionText { get; set; } = string.Empty;
 
-        public List<QuizAnswer> Answers { get; set; }
+        public List<QuizAnswer> Answers { get; set; } = new List<QuizAnswer>();
     }
 }

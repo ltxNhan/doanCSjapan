@@ -1,132 +1,242 @@
-﻿@model JapanApp.Models.Festival
+@model JapanApp.Models.Festival
 
 @{
     ViewData["Title"] = Model.Name;
+    
+    // Check if user has already reviewed
+    var currentUserIdStr = Context.Session.GetString("UserID");
+    int? currentUserId = null;
+    if (!string.IsNullOrEmpty(currentUserIdStr)) {
+        currentUserId = int.Parse(currentUserIdStr);
+    }
+    
+    bool hasReviewed = false;
+    if (currentUserId.HasValue && Model.Reviews != null) {
+        hasReviewed = Model.Reviews.Any(r => r.UserID == currentUserId.Value);
+    }
 }
 
-<div class="festival-detail-page">
-
-    <!-- BACK BUTTON -->
-    <div class="mb-4">
-        <a href="/Festival" class="btn btn-outline-secondary rounded-pill px-4">
-            ← Back to Festivals
-        </a>
-    </div>
-
-    <!-- HERO DETAIL CARD -->
-    <div class="detail-card shadow-lg">
-
-        <!-- IMAGE -->
-        <div class="detail-image-wrap">
-            <img src="@Url.Content("~/images/" + GetImageName(Model.Name))"
-                 onerror="this.onerror=null; this.src='@Url.Content("~/images/default.jpg")';"
-                 alt="@Model.Name"
-                 class="detail-image" />
-
-            <div class="image-overlay">
-                <span class="badge bg-danger px-3 py-2">Festival</span>
-            </div>
+<div class="premium-festival-detail">
+    
+    <!-- HEADER HERO -->
+    <div class="hero-section">
+        <img src="@Url.Content("~/images/" + GetImageName(Model.Name))"
+             onerror="this.onerror=null; this.src='@Url.Content("~/images/default.jpg")';"
+             alt="@Model.Name"
+             class="hero-image" />
+        <div class="hero-overlay"></div>
+        
+        <!-- Top Nav inside Hero -->
+        <div class="hero-top-nav">
+            <a href="/Festival" class="btn-back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Trở về
+            </a>
+            <a href="/Festival/AddFavorite/@Model.FestivalID" class="btn-favorite-float" title="Theo dõi">
+                ❤️
+            </a>
         </div>
 
-        <!-- CONTENT -->
-        <div class="detail-content">
-
-            <h1 class="festival-title">@Model.Name</h1>
-
-            <p class="festival-subtitle">
-                Discover one of Japan's most beautiful traditional festivals.
+        <div class="hero-content">
+            <div class="badge-glass">🎌 Japan Festival</div>
+            <h1 class="hero-title">@Model.Name</h1>
+            <p class="hero-location">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> 
+                @Model.LocationName
             </p>
+        </div>
+    </div>
 
-            <div class="info-grid">
-
-                <!-- LOCATION CLICK -->
-                <div class="info-box location-click" onclick="showFestivalMap()">
-                    <div class="info-icon">📍</div>
-                    <div>
-                        <small>Location</small>
-                        <strong>@Model.LocationName</strong>
-                        <span class="map-hint">Click to view on map</span>
+    <!-- MAIN CONTENT -->
+    <div class="container main-content-area">
+        <div class="row custom-gap">
+            
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-8 content-column">
+                
+                <!-- ABOUT -->
+                <div class="content-card fade-up">
+                    <h2 class="section-title">Về lễ hội</h2>
+                    <div class="about-text">
+                        @Html.Raw(Model.Content?.Replace("\n", "<br/>"))
                     </div>
                 </div>
 
-                <div class="info-box">
-                    <div class="info-icon">📅</div>
-                    <div>
-                        <small>Start Date</small>
-                        <strong>@GetUpcomingStartDate(Model.StartDate, Model.EndDate)</strong>
+                <!-- MAP -->
+                <div class="content-card fade-up" style="animation-delay: 0.1s;">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <h2 class="section-title mb-0">Bản đồ địa điểm</h2>
+                        @if (Model.Latitude != 0 && Model.Longitude != 0)
+                        {
+                            <a href="https://www.google.com/maps/search/?api=1&query=@Model.Latitude,@Model.Longitude" 
+                               target="_blank" 
+                               class="btn-open-map">
+                                🗺️ Mở Google Maps
+                            </a>
+                        }
+                    </div>
+                    
+                    <div class="map-wrapper shadow-sm">
+                        @if (Model.Latitude != 0 && Model.Longitude != 0)
+                        {
+                            <iframe 
+                                width="100%" 
+                                height="100%" 
+                                frameborder="0" 
+                                style="border:0;" 
+                                src="https://maps.google.com/maps?q=@Model.Latitude,@Model.Longitude&hl=vi&z=15&output=embed" 
+                                allowfullscreen>
+                            </iframe>
+                        }
+                        else
+                        {
+                            <div class="empty-map">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" class="mb-2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                <p class="mb-0">Chưa có tọa độ bản đồ cụ thể.</p>
+                            </div>
+                        }
                     </div>
                 </div>
 
-                <div class="info-box">
-                    <div class="info-icon">🏁</div>
-                    <div>
-                        <small>End Date</small>
-                        <strong>@GetUpcomingEndDate(Model.StartDate, Model.EndDate)</strong>
-                    </div>
+                <!-- REVIEWS -->
+                <div class="content-card fade-up" style="animation-delay: 0.2s;">
+                    <h2 class="section-title mb-4">Đánh giá & Trải nghiệm</h2>
+                    
+                    @if (Model.Reviews != null && Model.Reviews.Any())
+                    {
+                        <div class="review-list">
+                            @foreach(var review in Model.Reviews.OrderByDescending(r => r.ReviewDate))
+                            {
+                                <div class="review-item">
+                                    <div class="reviewer-avatar shadow-sm">
+                                        @(review.User?.Username?.Substring(0,1).ToUpper() ?? "U")
+                                    </div>
+                                    <div class="review-content flex-grow-1">
+                                        <div class="review-header">
+                                            <strong class="text-dark">@(review.User?.Username ?? "Ẩn danh")</strong>
+                                            <span class="review-date">@review.ReviewDate.ToString("dd/MM/yyyy")</span>
+                                        </div>
+                                        <div class="review-stars">
+                                            @for(int i = 0; i < review.Rating; i++) { <span>⭐</span> }
+                                        </div>
+                                        <p class="review-text">@review.Comment</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-reviews shadow-sm">
+                            Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!
+                        </div>
+                    }
+
+                    <!-- Add Review Form -->
+                    @if (currentUserId.HasValue)
+                    {
+                        if (!hasReviewed)
+                        {
+                            <div class="add-review-box mt-4 shadow-sm">
+                                <h4>Viết đánh giá của bạn</h4>
+                                <form action="/Festival/AddReview" method="post" class="mt-3">
+                                    <input type="hidden" name="festivalId" value="@Model.FestivalID" />
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark">Điểm đánh giá</label>
+                                        <div class="star-rating-input">
+                                            <select name="rating" class="form-select shadow-sm" style="width: 180px; border-radius: 12px;" required>
+                                                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                                                <option value="4">⭐⭐⭐⭐ (4)</option>
+                                                <option value="3">⭐⭐⭐ (3)</option>
+                                                <option value="2">⭐⭐ (2)</option>
+                                                <option value="1">⭐ (1)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark">Bình luận</label>
+                                        <textarea name="comment" class="form-control custom-input shadow-sm" rows="3" placeholder="Chia sẻ trải nghiệm chân thực của bạn..." required></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn-submit-review w-100">Gửi đánh giá</button>
+                                </form>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="login-prompt mt-4 shadow-sm">
+                            <p>Bạn cần đăng nhập để viết đánh giá.</p>
+                            <a href="/Account/Login" class="btn-login-prompt">Đăng nhập ngay</a>
+                        </div>
+                    }
                 </div>
 
-                @if (Model.Region != null)
-                {
-                    <div class="info-box">
-                        <div class="info-icon">🗾</div>
-                        <div>
-                            <small>Region</small>
-                            <strong>@Model.Region.RegionName</strong>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-lg-4 sidebar-column">
+                <div class="sticky-sidebar fade-up" style="animation-delay: 0.3s;">
+                    
+                    <div class="glass-info-card shadow-lg">
+                        <h3 class="info-card-title">Thông tin nổi bật</h3>
+                        
+                        <div class="info-list">
+                            <div class="info-row">
+                                <div class="info-icon-sm">📍</div>
+                                <div class="info-data">
+                                    <small>Địa điểm</small>
+                                    <strong>@Model.LocationName</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="info-row">
+                                <div class="info-icon-sm">📅</div>
+                                <div class="info-data">
+                                    <small>Thời gian diễn ra</small>
+                                    <strong>@GetUpcomingStartDate(Model.StartDate, Model.EndDate) - @GetUpcomingEndDate(Model.StartDate, Model.EndDate)</strong>
+                                </div>
+                            </div>
+
+                            @if (Model.Region != null)
+                            {
+                                <div class="info-row">
+                                    <div class="info-icon-sm">🗾</div>
+                                    <div class="info-data">
+                                        <small>Vùng</small>
+                                        <strong>@Model.Region.RegionName</strong>
+                                    </div>
+                                </div>
+                            }
+
+                            @if (Model.Season != null)
+                            {
+                                <div class="info-row">
+                                    <div class="info-icon-sm">🌸</div>
+                                    <div class="info-data">
+                                        <small>Mùa</small>
+                                        <strong>@Model.Season.SeasonName</strong>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="sidebar-actions">
+                            <button type="button" class="btn-action btn-calendar" onclick="openFestivalCalendar()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Lịch trình chi tiết
+                            </button>
+                            <a href="/Festival/AddFavorite/@Model.FestivalID" class="btn-action btn-favorite">
+                                ❤️ Theo dõi lễ hội này
+                            </a>
                         </div>
                     </div>
-                }
-
-                @if (Model.Season != null)
-                {
-                    <div class="info-box">
-                        <div class="info-icon">🌸</div>
-                        <div>
-                            <small>Season</small>
-                            <strong>@Model.Season.SeasonName</strong>
-                        </div>
-                    </div>
-                }
-
-            </div>
-
-            <hr class="my-4" />
-
-            <div class="section-block">
-                <h3>About this festival</h3>
-
-                <p>
-                    @Model.Content
-                </p>
-            </div>
-
-            <!-- MAP SECTION -->
-            <div id="mapSection" class="map-section">
-                <div class="map-header">
-                    <div>
-                        <h3>Location on Japan Map</h3>
-                        <p>@Model.Name - @Model.LocationName</p>
-                    </div>
-
-                    <span class="map-badge">OpenStreetMap API</span>
+                    
                 </div>
-
-                <div id="festivalMap"></div>
             </div>
-
-            <div class="action-area">
-                <button type="button" class="btn btn-primary rounded-pill px-4 py-2" onclick="openFestivalCalendar()">
-                    📅 View Calendar
-                </button>
-
-                <a href="/Festival/AddFavorite/@Model.FestivalID" class="btn btn-danger rounded-pill px-4 py-2">
-                    ❤️ Add to Favorite
-                </a>
-
-                <a href="/Festival" class="btn btn-light border rounded-pill px-4 py-2">
-                    View More Festivals
-                </a>
-            </div>
-
+            
         </div>
     </div>
 </div>
@@ -136,21 +246,19 @@
     <div class="calendar-box">
         <div class="calendar-header">
             <div>
-                <h3>Festival Calendar</h3>
+                <h3>Lịch trình lễ hội</h3>
                 <p>@Model.Name</p>
             </div>
-
             <button type="button" class="calendar-close" onclick="closeFestivalCalendar()">×</button>
         </div>
 
         <div class="calendar-date-info">
             <div>
-                <small>Start Date</small>
+                <small>Ngày bắt đầu</small>
                 <strong>@GetUpcomingStartDate(Model.StartDate, Model.EndDate)</strong>
             </div>
-
             <div>
-                <small>End Date</small>
+                <small>Ngày kết thúc</small>
                 <strong>@GetUpcomingEndDate(Model.StartDate, Model.EndDate)</strong>
             </div>
         </div>
@@ -158,231 +266,526 @@
         <div class="calendar-month-title" id="calendarMonthTitle"></div>
 
         <div class="calendar-weekdays">
-            <span>Sun</span>
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
+            <span>CN</span>
+            <span>T2</span>
+            <span>T3</span>
+            <span>T4</span>
+            <span>T5</span>
+            <span>T6</span>
+            <span>T7</span>
         </div>
 
         <div id="calendarDays" class="calendar-days"></div>
 
         <div class="calendar-note">
             <span class="legend-active"></span>
-            Festival date range
+            Khoảng thời gian diễn ra lễ hội
         </div>
     </div>
 </div>
 
-<!-- LEAFLET MAP API -->
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
-    .festival-detail-page {
-        max-width: 1180px;
-        margin: 0 auto;
-        padding: 30px 15px 60px;
+    /* PREMIUM AESTHETIC */
+    :root {
+        --primary: #d90429;
+        --primary-light: #ef233c;
+        --dark: #2b2d42;
+        --gray: #8d99ae;
+        --light: #edf2f4;
+    }
+    
+    .premium-festival-detail {
+        margin: -30px; /* Overcome normal-page padding */
+        padding-bottom: 80px;
+        background: #f8f9fc;
+        font-family: 'Poppins', sans-serif;
     }
 
-    .detail-card {
-        background: white;
-        border-radius: 28px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.06);
-    }
-
-    .detail-image-wrap {
+    /* Hero */
+    .hero-section {
         position: relative;
         width: 100%;
-        height: 430px;
+        height: 60vh;
+        min-height: 450px;
+        border-radius: 0 0 50px 50px;
         overflow: hidden;
-        background: #f5f5f5;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.15);
     }
 
-    .detail-image {
+    .hero-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
+        transform: scale(1.05);
+        animation: subtleZoom 15s infinite alternate;
     }
 
-    .image-overlay {
+    @@keyframes subtleZoom {
+        from { transform: scale(1.05); }
+        to { transform: scale(1.1); }
+    }
+
+    .hero-overlay {
         position: absolute;
-        left: 28px;
-        bottom: 24px;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(43,45,66,0.3) 0%, rgba(43,45,66,0.9) 100%);
     }
 
-    .detail-content {
-        padding: 38px 44px 44px;
-    }
-
-    .festival-title {
-        font-size: 42px;
-        font-weight: 800;
-        color: #222;
-        margin-bottom: 10px;
-    }
-
-    .festival-subtitle {
-        font-size: 18px;
-        color: #777;
-        margin-bottom: 28px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-    }
-
-    .info-box {
+    .hero-top-nav {
+        position: absolute;
+        top: 30px;
+        left: 0;
+        width: 100%;
+        padding: 0 5%;
         display: flex;
-        gap: 14px;
+        justify-content: space-between;
         align-items: center;
-        background: #fafafa;
-        border: 1px solid #eee;
-        border-radius: 18px;
-        padding: 18px;
+        z-index: 10;
     }
 
-    .info-icon {
-        width: 46px;
-        height: 46px;
+    .btn-back {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px);
+        color: white;
+        padding: 10px 22px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.25);
+        transition: 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: white;
+        color: var(--dark);
+        transform: translateX(-5px);
+    }
+
+    .btn-favorite-float {
+        width: 48px;
+        height: 48px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.25);
         border-radius: 50%;
-        background: #fff0f2;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 22px;
+        text-decoration: none;
+        transition: 0.3s;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .btn-favorite-float:hover {
+        background: var(--primary);
+        transform: scale(1.1) translateY(-3px);
+        border-color: var(--primary);
+    }
+
+    .hero-content {
+        position: absolute;
+        bottom: 70px;
+        left: 5%;
+        right: 5%;
+        z-index: 10;
+    }
+
+    .badge-glass {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.4);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .hero-title {
+        color: white;
+        font-size: 64px;
+        font-weight: 900;
+        line-height: 1.1;
+        margin-bottom: 15px;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .hero-location {
+        color: rgba(255,255,255,0.9);
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    /* Content Area */
+    .main-content-area {
+        margin-top: -30px; /* Overlap the hero slightly */
+        position: relative;
+        z-index: 20;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.04);
+        margin-bottom: 30px;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .section-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--dark);
+        margin-bottom: 30px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 50px;
+        height: 5px;
+        background: var(--primary);
+        border-radius: 5px;
+    }
+
+    .about-text {
+        font-size: 17px;
+        line-height: 1.8;
+        color: #4a5060;
+    }
+
+    /* Map */
+    .btn-open-map {
+        background: #e8f0fe;
+        color: #1a73e8;
+        padding: 10px 20px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        transition: 0.2s;
+        border: 1px solid #d2e3fc;
+    }
+    .btn-open-map:hover {
+        background: #d2e3fc;
+        transform: translateY(-2px);
+    }
+
+    .map-wrapper {
+        width: 100%;
+        height: 400px;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #f1f3f5;
+        border: 1px solid #eaeaea;
+    }
+
+    .empty-map {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--gray);
+    }
+
+    /* Reviews */
+    .review-item {
+        display: flex;
+        gap: 18px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #f1f3f5;
+        margin-bottom: 25px;
+    }
+
+    .review-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .reviewer-avatar {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), #ff4d6d);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 22px;
         flex-shrink: 0;
     }
 
-    .info-box small {
-        display: block;
-        color: #888;
-        font-size: 13px;
-        margin-bottom: 3px;
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
     }
 
-    .info-box strong {
+    .review-date {
+        color: var(--gray);
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .review-stars {
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .review-text {
+        color: #555;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .empty-reviews {
+        background: #f8f9fc;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        color: var(--gray);
+        font-size: 15px;
+        border: 1px dashed #d1d5db;
+    }
+
+    .add-review-box {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 24px;
+        border: 1px solid #f1f3f5;
+    }
+
+    .add-review-box h4 {
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--dark);
+        margin-bottom: 20px;
+    }
+
+    .custom-input {
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+        font-size: 15px;
+        resize: none;
+    }
+
+    .custom-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(217, 4, 41, 0.1);
+    }
+
+    .btn-submit-review {
+        background: linear-gradient(135deg, var(--primary), #ff4d6d);
+        color: white;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: 0.3s;
+        box-shadow: 0 10px 25px rgba(217, 4, 41, 0.25);
+    }
+
+    .btn-submit-review:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(217, 4, 41, 0.35);
+    }
+
+    .login-prompt {
+        background: #fff0f2;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        border: 1px solid #ffe1e6;
+    }
+
+    .btn-login-prompt {
+        display: inline-block;
+        background: var(--primary);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 15px;
+        margin-top: 10px;
+        box-shadow: 0 8px 20px rgba(217, 4, 41, 0.2);
+    }
+    .btn-login-prompt:hover { color: white; transform: translateY(-2px); }
+
+    /* Sticky Sidebar */
+    .sticky-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+
+    .glass-info-card {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        padding: 35px;
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .info-card-title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 25px;
+        color: var(--dark);
+    }
+
+    .info-list {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .info-icon-sm {
+        width: 50px;
+        height: 50px;
+        background: #fff0f2;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--primary);
+        flex-shrink: 0;
+    }
+
+    .info-data small {
         display: block;
-        color: #222;
+        color: var(--gray);
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-data strong {
+        display: block;
+        color: var(--dark);
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .sidebar-actions {
+        margin-top: 35px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-action {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: 0.3s;
+        border: none;
+        cursor: pointer;
         font-size: 16px;
     }
 
-    .location-click {
-        cursor: pointer;
-        transition: 0.25s;
+    .btn-calendar {
+        background: var(--dark);
+        color: white;
+        box-shadow: 0 10px 25px rgba(43,45,66,0.2);
     }
 
-        .location-click:hover {
-            background: #fff0f2;
-            border-color: #ef3b4d;
-            transform: translateY(-3px);
-        }
-
-    .map-hint {
-        display: block;
-        font-size: 12px;
-        color: #ef3b4d;
-        margin-top: 4px;
+    .btn-calendar:hover {
+        background: #1a1a24;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(43,45,66,0.3);
     }
 
-    .section-block h3 {
-        font-size: 26px;
-        font-weight: 800;
-        margin-bottom: 14px;
-        color: #222;
-    }
-
-    .section-block p {
-        font-size: 18px;
-        line-height: 1.8;
-        color: #555;
-        margin-bottom: 0;
-    }
-
-    .map-section {
-        margin-top: 40px;
-        background: #ffffff;
-        border-radius: 24px;
-        border: 1px solid #eee;
-        padding: 24px;
-    }
-
-    .map-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        align-items: center;
-        margin-bottom: 18px;
-    }
-
-        .map-header h3 {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 5px;
-            color: #222;
-        }
-
-        .map-header p {
-            color: #777;
-            margin-bottom: 0;
-        }
-
-    .map-badge {
+    .btn-favorite {
         background: #fff0f2;
-        color: #ef3b4d;
+        color: var(--primary);
         border: 1px solid #ffd1d8;
-        padding: 8px 14px;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-        white-space: nowrap;
     }
 
-    #festivalMap {
-        width: 100%;
-        height: 430px;
-        border-radius: 20px;
-        overflow: hidden;
-        border: 1px solid #ddd;
+    .btn-favorite:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(217, 4, 41, 0.25);
     }
 
-    .action-area {
-        display: flex;
-        gap: 12px;
-        margin-top: 32px;
-        flex-wrap: wrap;
+    /* Animations */
+    .fade-up {
+        animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+        transform: translateY(30px);
     }
 
+    @@keyframes fadeUp {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Calendar Modal (Preserved & Enhanced) */
     .calendar-modal {
         display: none;
         position: fixed;
-        z-index: 9999;
+        z-index: 99999;
         inset: 0;
-        background: rgba(0,0,0,0.45);
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(8px);
         align-items: center;
         justify-content: center;
         padding: 20px;
     }
 
-        .calendar-modal.show {
-            display: flex;
-        }
+    .calendar-modal.show { display: flex; }
 
     .calendar-box {
         width: 100%;
         max-width: 560px;
         background: #ffffff;
-        border-radius: 28px;
-        padding: 28px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+        border-radius: 30px;
+        padding: 35px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        animation: modalScale 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @@keyframes modalScale {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
     }
 
     .calendar-header {
@@ -390,228 +793,149 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: 16px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
-        .calendar-header h3 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            color: #222;
-        }
+    .calendar-header h3 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 4px;
+        color: var(--dark);
+    }
 
-        .calendar-header p {
-            margin-bottom: 0;
-            color: #777;
-        }
+    .calendar-header p {
+        margin-bottom: 0;
+        color: var(--gray);
+        font-weight: 500;
+    }
 
     .calendar-close {
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         border: none;
-        background: #f4f4f4;
+        background: #f1f3f5;
         font-size: 28px;
         line-height: 1;
         cursor: pointer;
+        transition: 0.2s;
     }
 
-        .calendar-close:hover {
-            background: #ffe1e6;
-            color: #ef3b4d;
-        }
+    .calendar-close:hover {
+        background: #ffe1e6;
+        color: var(--primary);
+    }
 
     .calendar-date-info {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
-        margin-bottom: 22px;
+        gap: 15px;
+        margin-bottom: 25px;
     }
 
-        .calendar-date-info div {
-            background: #fafafa;
-            border: 1px solid #eee;
-            border-radius: 16px;
-            padding: 16px;
-        }
+    .calendar-date-info div {
+        background: #f8f9fc;
+        border: 1px solid #eaeaea;
+        border-radius: 20px;
+        padding: 18px;
+    }
 
-        .calendar-date-info small {
-            display: block;
-            color: #888;
-            margin-bottom: 4px;
-        }
+    .calendar-date-info small {
+        display: block;
+        color: var(--gray);
+        margin-bottom: 4px;
+        font-weight: 600;
+    }
 
-        .calendar-date-info strong {
-            color: #222;
-        }
+    .calendar-date-info strong {
+        color: var(--dark);
+        font-size: 16px;
+        font-weight: 800;
+    }
 
     .calendar-month-title {
         text-align: center;
         font-size: 22px;
         font-weight: 800;
-        margin-bottom: 16px;
+        margin-bottom: 18px;
+        color: var(--primary);
     }
 
     .calendar-weekdays,
     .calendar-days {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
+        gap: 10px;
     }
 
-        .calendar-weekdays span {
-            text-align: center;
-            font-size: 13px;
-            color: #888;
-            font-weight: 700;
-        }
+    .calendar-weekdays span {
+        text-align: center;
+        font-size: 13px;
+        color: var(--gray);
+        font-weight: 700;
+    }
 
     .calendar-day {
-        height: 46px;
+        height: 48px;
         border-radius: 14px;
-        background: #f7f7f7;
+        background: #f8f9fc;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #333;
-        font-weight: 600;
+        color: var(--dark);
+        font-weight: 700;
+        font-size: 15px;
     }
 
-        .calendar-day.empty {
-            background: transparent;
-        }
+    .calendar-day.empty { background: transparent; }
 
-        .calendar-day.active {
-            background: #ef3b4d;
-            color: white;
-        }
+    .calendar-day.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 4px 15px rgba(217, 4, 41, 0.3);
+    }
 
-        .calendar-day.today {
-            border: 2px solid #222;
-        }
+    .calendar-day.today {
+        border: 2px solid var(--dark);
+    }
 
     .calendar-note {
-        margin-top: 18px;
-        color: #666;
+        margin-top: 20px;
+        color: var(--gray);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        font-weight: 500;
     }
 
     .legend-active {
-        width: 16px;
-        height: 16px;
-        background: #ef3b4d;
-        border-radius: 5px;
+        width: 18px;
+        height: 18px;
+        background: var(--primary);
+        border-radius: 6px;
         display: inline-block;
     }
 
+    /* Responsive */
     @@media (max-width: 992px) {
-        .info-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .festival-title {
-            font-size: 34px;
-        }
-
-        .detail-image-wrap {
-            height: 350px;
-        }
+        .hero-title { font-size: 48px; }
+        .content-card { padding: 30px; }
+        .hero-section { height: 50vh; }
     }
 
-    @@media (max-width: 576px) {
-        .detail-content {
-            padding: 28px 22px 32px;
-        }
-
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .festival-title {
-            font-size: 30px;
-        }
-
-        .detail-image-wrap {
-            height: 260px;
-        }
-
-        .map-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        #festivalMap {
-            height: 320px;
-        }
-
-        .calendar-date-info {
-            grid-template-columns: 1fr;
-        }
-
-        .calendar-day {
-            height: 38px;
-            border-radius: 10px;
-        }
+    @@media (max-width: 768px) {
+        .premium-festival-detail { margin: -15px; } /* Mobile padding is 15px usually */
+        .hero-section { height: 45vh; border-radius: 0 0 30px 30px; }
+        .hero-title { font-size: 36px; }
+        .hero-top-nav { top: 20px; }
+        .badge-glass { margin-bottom: 10px; }
+        .content-card { padding: 25px; border-radius: 20px; }
+        .hero-content { bottom: 40px; }
+        .info-row { gap: 12px; }
+        .info-icon-sm { width: 40px; height: 40px; font-size: 18px; }
+        .btn-open-map { padding: 8px 15px; font-size: 13px; }
     }
 </style>
-
-<script>
-    let festivalMap;
-    let festivalMarker;
-
-    const festivalLatitude = @Model.Latitude;
-    const festivalLongitude = @Model.Longitude;
-    const festivalName = "@Model.Name";
-    const festivalLocation = "@Model.LocationName";
-
-    function initFestivalMap() {
-        let lat = festivalLatitude;
-        let lng = festivalLongitude;
-
-        if (lat === 0 || lng === 0) {
-            lat = 36.2048;
-            lng = 138.2529;
-        }
-
-        festivalMap = L.map('festivalMap').setView([lat, lng], 6);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(festivalMap);
-
-        if (festivalLatitude !== 0 && festivalLongitude !== 0) {
-            festivalMarker = L.marker([festivalLatitude, festivalLongitude])
-                .addTo(festivalMap)
-                .bindPopup("<b>" + festivalName + "</b><br>" + festivalLocation);
-        }
-    }
-
-    function showFestivalMap() {
-        document.getElementById("mapSection").scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-
-        setTimeout(function () {
-            if (festivalLatitude !== 0 && festivalLongitude !== 0) {
-                festivalMap.setView([festivalLatitude, festivalLongitude], 14);
-                festivalMarker.openPopup();
-            } else {
-                festivalMap.setView([36.2048, 138.2529], 5);
-                alert("Lễ hội này chưa có tọa độ bản đồ. Hãy thêm Latitude và Longitude trong database.");
-            }
-
-            festivalMap.invalidateSize();
-        }, 500);
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        initFestivalMap();
-    });
-</script>
 
 <script>
     const calendarStartDate = new Date("@GetDisplayStartDate(Model.StartDate, Model.EndDate).ToString("yyyy-MM-dd")T00:00:00");
@@ -629,15 +953,14 @@
     function renderFestivalCalendar() {
         const monthTitle = document.getElementById("calendarMonthTitle");
         const calendarDays = document.getElementById("calendarDays");
-
         calendarDays.innerHTML = "";
 
         const year = calendarStartDate.getFullYear();
         const month = calendarStartDate.getMonth();
 
         const monthNames = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
+            "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+            "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
         ];
 
         monthTitle.innerText = monthNames[month] + " " + year;
@@ -679,7 +1002,6 @@
 
     window.addEventListener("click", function (event) {
         const modal = document.getElementById("calendarModal");
-
         if (event.target === modal) {
             closeFestivalCalendar();
         }
@@ -690,29 +1012,21 @@
     public DateTime GetDisplayStartDate(DateTime startDate, DateTime endDate)
     {
         var today = DateTime.Today;
-
         var displayStart = new DateTime(today.Year, startDate.Month, startDate.Day);
         var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
-
-        if (displayEnd < today)
-        {
+        if (displayEnd < today) {
             displayStart = new DateTime(today.Year + 1, startDate.Month, startDate.Day);
         }
-
         return displayStart;
     }
 
     public DateTime GetDisplayEndDate(DateTime startDate, DateTime endDate)
     {
         var today = DateTime.Today;
-
         var displayEnd = new DateTime(today.Year, endDate.Month, endDate.Day);
-
-        if (displayEnd < today)
-        {
+        if (displayEnd < today) {
             displayEnd = new DateTime(today.Year + 1, endDate.Month, endDate.Day);
         }
-
         return displayEnd;
     }
 
@@ -729,28 +1043,21 @@
     public string GetImageName(string name)
     {
         name = (name ?? "").ToLower();
-
         if (name.Contains("hanami")) return "tokyo-hanami.jpg";
         if (name.Contains("sumida")) return "tokyo-sumida.jpg";
         if (name.Contains("kanda")) return "tokyo-kanda.jpg";
         if (name.Contains("asakusa")) return "tokyo-asakusa.jpg";
-
         if (name.Contains("gion")) return "kyoto-gion.jpg";
         if (name.Contains("aoi")) return "kyoto-aoi1.jpg";
         if (name.Contains("jidai")) return "kyoto-jidai.jpg";
-
         if (name.Contains("tenjin")) return "osaka-tenjin.jpg";
         if (name.Contains("sumiyoshi")) return "osaka-sumiyoshi.jpg";
-
         if (name.Contains("snow")) return "sapporo-snow.jpg";
         if (name.Contains("yosakoi")) return "sapporo-yosakoi.jpg";
-
         if (name.Contains("hakata")) return "fukuoka-hakata.jpg";
         if (name.Contains("lantern")) return "nagasaki-lantern.jpg";
-
         if (name.Contains("takayama")) return "takayama.jpg";
         if (name.Contains("fuji")) return "fuji.jpg";
-
         if (name.Contains("akita")) return "akita.jpg";
         if (name.Contains("nebuta")) return "nebuta.jpg";
         if (name.Contains("sendai")) return "sendai.jpg";
@@ -762,7 +1069,6 @@
         if (name.Contains("nara")) return "nara.jpg";
         if (name.Contains("chichibu")) return "chichibu.jpg";
         if (name.Contains("kawagoe")) return "kawagoe.jpg";
-
         return "default.jpg";
     }
 }

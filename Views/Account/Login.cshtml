@@ -1,285 +1,385 @@
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Đăng nhập / Đăng ký";
+    Layout = null; 
 }
 
-<style>
-    .login-page {
-        min-height: 85vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* Background glow */
-    .login-bg-circle {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(70px);
-        opacity: 0.35;
-        z-index: 0;
-    }
-
-    .circle1 {
-        width: 300px;
-        height: 300px;
-        background: #ff4d6d;
-        top: -60px;
-        left: -80px;
-    }
-
-    .circle2 {
-        width: 350px;
-        height: 350px;
-        background: #4f46e5;
-        bottom: -120px;
-        right: -120px;
-    }
-
-    .login-card {
-        width: 100%;
-        max-width: 460px;
-        background: rgba(255,255,255,0.18);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255,255,255,0.25);
-        border-radius: 30px;
-        padding: 40px;
-        box-shadow:
-            0 10px 40px rgba(0,0,0,0.18),
-            inset 0 1px 1px rgba(255,255,255,0.3);
-        position: relative;
-        z-index: 2;
-        overflow: hidden;
-    }
-
-    .login-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background:
-            linear-gradient(
-                135deg,
-                rgba(255,255,255,0.16),
-                rgba(255,255,255,0.02)
-            );
-        z-index: -1;
-    }
-
-    .login-logo {
-        width: 95px;
-        height: 95px;
-        border-radius: 28px;
-        margin: auto;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 42px;
-        font-weight: 800;
-        color: white;
-        background: linear-gradient(135deg,#ef4444,#dc2626);
-        box-shadow: 0 12px 30px rgba(220,38,38,0.35);
-        animation: floatLogo 3s ease-in-out infinite;
-    }
-
-    @@keyframes floatLogo {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-8px); }
-        100% { transform: translateY(0px); }
-    }
-
-    .login-title {
-        text-align: center;
-        font-size: 34px;
-        font-weight: 800;
-        color: #1f2937;
-        margin-bottom: 6px;
-    }
-
-    .login-subtitle {
-        text-align: center;
-        color: #6b7280;
-        margin-bottom: 30px;
-        font-size: 15px;
-    }
-
-    .form-label {
-        font-weight: 700;
-        color: #374151;
-        margin-bottom: 8px;
-    }
-
-    .modern-input {
-        border: none;
-        border-radius: 18px;
-        padding: 15px 18px;
-        background: rgba(255,255,255,0.65);
-        box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
-        transition: 0.25s;
-        font-size: 15px;
-    }
-
-    .modern-input:focus {
-        background: white;
-        box-shadow:
-            0 0 0 4px rgba(239,68,68,0.18);
-        outline: none;
-    }
-
-    .login-btn {
-        width: 100%;
-        border: none;
-        border-radius: 18px;
-        padding: 15px;
-        font-size: 17px;
-        font-weight: 800;
-        color: white;
-        background: linear-gradient(135deg,#ef4444,#b91c1c);
-        transition: 0.25s;
-        margin-top: 10px;
-        box-shadow: 0 10px 25px rgba(220,38,38,0.28);
-    }
-
-    .login-btn:hover {
-        transform: translateY(-3px) scale(1.01);
-        box-shadow: 0 14px 35px rgba(220,38,38,0.38);
-    }
-
-    .error-box {
-        background: rgba(239,68,68,0.12);
-        color: #dc2626;
-        border: 1px solid rgba(239,68,68,0.2);
-        border-radius: 14px;
-        padding: 12px;
-        margin-bottom: 18px;
-        text-align: center;
-        font-weight: 600;
-    }
-
-    .demo-box {
-        margin-top: 25px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.5);
-        padding: 18px;
-        text-align: center;
-    }
-
-    .demo-title {
-        font-weight: 800;
-        margin-bottom: 10px;
-        color: #111827;
-    }
-
-    .demo-item {
-        margin-bottom: 6px;
-        color: #374151;
-    }
-
-    .login-footer {
-        margin-top: 25px;
-        text-align: center;
-        font-size: 14px;
-        color: #6b7280;
-    }
-
-    .login-footer a {
-        color: #dc2626;
-        font-weight: 700;
-        text-decoration: none;
-    }
-
-    @@media(max-width:576px) {
-        .login-card {
-            padding: 28px;
-            border-radius: 24px;
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Japan Festival</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Background outside the room */
+            background-image: url('https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
         }
 
-        .login-title {
+        .room-container {
+            position: relative;
+            width: 1000px;
+            max-width: 95%;
+            height: 600px;
+            background: #fff;
+            border: 15px solid #3e2723;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            overflow: hidden;
+            display: flex;
+            box-sizing: border-box;
+        }
+
+        .form-panel {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: #fdfaf6; /* soft paper color */
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .form-wrapper {
+            width: 100%;
+            max-width: 350px;
+            z-index: 5;
+        }
+
+        .brand-logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            color: #d90429;
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .login-heading {
             font-size: 28px;
-        }
-    }
-</style>
-
-<div class="login-page">
-
-    <div class="login-bg-circle circle1"></div>
-    <div class="login-bg-circle circle2"></div>
-
-    <div class="login-card">
-
-        <div class="login-logo">
-            JP
-        </div>
-
-        <div class="login-title">
-            Welcome Back
-        </div>
-
-        <div class="login-subtitle">
-            Đăng nhập để khám phá lễ hội Nhật Bản
-        </div>
-
-        @if (ViewBag.Error != null)
-        {
-            <div class="error-box">
-                @ViewBag.Error
-            </div>
+            font-weight: 700;
+            color: #2b2b2b;
+            margin-bottom: 8px;
         }
 
-        <form method="post">
+        .login-subheading {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
 
-            <div class="mb-3">
-                <label class="form-label">
-                    Username
-                </label>
+        .form-group {
+            margin-bottom: 18px;
+        }
 
-                <input
-                    name="username"
-                    class="form-control modern-input"
-                    placeholder="Nhập username..." />
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #4a4a4a;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #fff;
+            box-sizing: border-box;
+        }
+
+        .form-control-custom:focus {
+            border-color: #d90429;
+            outline: none;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #d90429;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(217, 4, 41, 0.3);
+        }
+
+        .btn-login:hover {
+            background: #ef233c;
+            transform: translateY(-2px);
+        }
+
+        /* THE SHOJI DOOR */
+        .shoji-door {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 100;
+            transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1); /* smooth slide */
+            
+            /* Paper background */
+            background-color: rgba(253, 250, 246, 0.95);
+            
+            /* Wooden grid */
+            background-image: 
+                linear-gradient(90deg, #4a3018 6px, transparent 6px),
+                linear-gradient(0deg, #4a3018 6px, transparent 6px);
+            background-size: 25% 20%;
+            
+            /* Outer frame */
+            border: 12px solid #3e2723;
+            box-sizing: border-box;
+            
+            box-shadow: 10px 0 25px rgba(0,0,0,0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .room-container.right-panel-active .shoji-door {
+            transform: translateX(100%);
+            box-shadow: -10px 0 25px rgba(0,0,0,0.25);
+        }
+
+        /* Door Handle */
+        .shoji-handle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 80px;
+            background-color: #2b1b12;
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
+            transition: all 0.8s;
+        }
+
+        .room-container.right-panel-active .shoji-handle {
+            right: auto;
+            left: 15px;
+        }
+
+        /* Hint text on door */
+        .door-hint {
+            background: rgba(62, 39, 35, 0.95);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .shoji-door:hover .door-hint {
+            background: rgba(217, 4, 41, 1);
+        }
+
+        /* Back home link */
+        .back-home {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .back-home:hover {
+            color: #ff4d6d;
+        }
+
+        /* Mobile */
+        @@media (max-width: 768px) {
+            .room-container {
+                flex-direction: column;
+                height: 90vh;
+                overflow-y: auto;
+            }
+            .form-panel {
+                width: 100%;
+                height: auto;
+            }
+            .shoji-door {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div style="position:relative;">
+    <a href="/Home" class="back-home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Quay lại trang chủ
+    </a>
+
+    <div class="room-container" id="roomContainer">
+
+        <!-- SIGN UP (Left) - Hidden initially by door -->
+        <div class="form-panel">
+            <div class="form-wrapper">
+                <a href="/Home" class="brand-logo-text">🎌 JapanApp</a>
+                <h1 class="login-heading">Đăng ký</h1>
+                <p class="login-subheading">Tham gia cộng đồng khám phá Nhật Bản</p>
+
+                @if (ViewBag.RegisterError != null)
+                {
+                    <div style="background:#fef2f2; color:#b91c1c; padding:10px; border-radius:6px; margin-bottom:15px; font-size:13px; font-weight:600;">
+                        @ViewBag.RegisterError
+                    </div>
+                }
+
+                <form method="post" action="/Account/Register" id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Tên tài khoản</label>
+                        <input type="text" name="Username" class="form-control-custom" required />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="Email" class="form-control-custom" required />
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" id="password" name="PasswordHash" class="form-control-custom" required />
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label class="form-label">Xác nhận</label>
+                            <input type="password" id="confirmPassword" name="ConfirmPassword" class="form-control-custom" required />
+                        </div>
+                    </div>
+
+                    <p id="passwordError" class="text-danger" style="display:none; font-size:12px; font-weight:600; color:#dc2626;">
+                        Mật khẩu xác nhận không khớp!
+                    </p>
+
+                    <button type="submit" class="btn-login">Đăng ký mới</button>
+                </form>
             </div>
-
-            <div class="mb-3">
-                <label class="form-label">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    name="password"
-                    class="form-control modern-input"
-                    placeholder="Nhập mật khẩu..." />
-            </div>
-
-            <button class="login-btn">
-                🔑 Đăng nhập
-            </button>
-
-        </form>
-
-        <div class="demo-box">
-
-            <div class="demo-title">
-                Tài khoản Demo
-            </div>
-
-            <div class="demo-item">
-                👑 Admin:
-                <b>admin / 123</b>
-            </div>
-
-            <div class="demo-item">
-                👤 User:
-                <b>user / 123</b>
-            </div>
-
         </div>
 
-        <div class="login-footer">
-            Japan Festival Explorer 🇯🇵
+        <!-- SIGN IN (Right) - Visible initially -->
+        <div class="form-panel">
+            <div class="form-wrapper">
+                <a href="/Home" class="brand-logo-text">🎌 JapanApp</a>
+                <h1 class="login-heading">Đăng nhập</h1>
+                <p class="login-subheading">Mừng bạn quay trở lại lễ hội</p>
+
+                @if (ViewBag.LoginError != null)
+                {
+                    <div style="background:#fef2f2; color:#b91c1c; padding:10px; border-radius:6px; margin-bottom:15px; font-size:13px; font-weight:600;">
+                        @ViewBag.LoginError
+                    </div>
+                }
+
+                <form method="post" action="/Account/Login">
+                    <div class="form-group">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" name="username" class="form-control-custom" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mật khẩu</label>
+                        <input type="password" name="password" class="form-control-custom" required />
+                    </div>
+
+                    <button type="submit" class="btn-login">Đăng nhập</button>
+                </form>
+                
+                <div style="margin-top:20px; font-size:12px; color:#666;">
+                    <strong>Dùng thử:</strong> admin/123 hoặc user/123
+                </div>
+            </div>
+        </div>
+
+        <!-- THE SHOJI DOOR -->
+        <div class="shoji-door" id="shojiDoor" onclick="toggleDoor()">
+            <div class="shoji-handle"></div>
+            <div class="door-hint" id="doorHint">Mở cửa Đăng ký</div>
         </div>
 
     </div>
 </div>
+
+<script>
+    const roomContainer = document.getElementById('roomContainer');
+    const doorHint = document.getElementById('doorHint');
+    
+    let isLoginVisible = true;
+
+    function toggleDoor() {
+        if (isLoginVisible) {
+            // Slide right to cover Login, reveal Register
+            roomContainer.classList.add('right-panel-active');
+            doorHint.innerText = "Mở cửa Đăng nhập";
+            isLoginVisible = false;
+        } else {
+            // Slide left to cover Register, reveal Login
+            roomContainer.classList.remove('right-panel-active');
+            doorHint.innerText = "Mở cửa Đăng ký";
+            isLoginVisible = true;
+        }
+    }
+
+    // Automatically slide if requested
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceRegister = urlParams.get('showRegister') === 'true' || @((ViewBag.ShowRegister == true).ToString().ToLower());
+        
+        if (forceRegister) {
+            // A short delay helps ensure the transition is visible and smooth
+            setTimeout(() => {
+                if (isLoginVisible) {
+                    toggleDoor();
+                }
+            }, 50);
+        }
+    });
+
+    // Register Validation
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+        var pwd = document.getElementById("password").value;
+        var cpwd = document.getElementById("confirmPassword").value;
+        if (pwd !== cpwd) {
+            e.preventDefault();
+            document.getElementById("passwordError").style.display = "block";
+        } else {
+            document.getElementById("passwordError").style.display = "none";
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -118,16 +118,41 @@ namespace JapanApp.Services
                 .ToList();
         }
 
-        // 🧠 QUIZ RESULT
+        // 🧠 QUIZ RESULT (Dựa trên tổng điểm)
         public int GetSuggestedSeason(List<int> answerIds)
         {
-            var result = _context.QuizAnswers
+            var totalScore = _context.QuizAnswers
                 .Where(a => answerIds.Contains(a.AnswerID))
-                .GroupBy(a => a.SuggestSeasonID)
-                .OrderByDescending(g => g.Count())
-                .FirstOrDefault();
+                .Sum(a => a.Points);
 
-            return result?.Key ?? 1;
+            // 0–20: Xuân (1), 21–40: Hè (2), 41–60: Thu (3), 61–80: Đông (4)
+            if (totalScore <= 20) return 1;
+            if (totalScore <= 40) return 2;
+            if (totalScore <= 60) return 3;
+            return 4; // > 60
+        }
+
+        // Lấy tổng điểm (dùng cho Controller)
+        public int CalculateTotalScore(List<int> answerIds)
+        {
+            return _context.QuizAnswers
+                .Where(a => answerIds.Contains(a.AnswerID))
+                .Sum(a => a.Points);
+        }
+
+        // Lưu kết quả Quiz
+        public void SaveQuizResult(int userId, int totalScore, int suggestedSeasonId)
+        {
+            var result = new QuizResult
+            {
+                UserID = userId,
+                TotalScore = totalScore,
+                SuggestedSeasonID = suggestedSeasonId,
+                CreatedAt = DateTime.Now
+            };
+            
+            _context.QuizResults.Add(result);
+            _context.SaveChanges();
         }
 
         // 🎌 FESTIVAL BY SEASON

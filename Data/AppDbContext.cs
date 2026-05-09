@@ -21,10 +21,9 @@ namespace JapanApp.Data
         public DbSet<Review> Reviews { get; set; }
 
         public DbSet<Favorite> Favorites { get; set; }
-
         public DbSet<QuizQuestion> QuizQuestions { get; set; }
-
         public DbSet<QuizAnswer> QuizAnswers { get; set; }
+        public DbSet<QuizResult> QuizResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -70,6 +69,21 @@ namespace JapanApp.Data
 
             modelBuilder.Entity<Favorite>()
                 .HasKey(f => new { f.UserID, f.FestivalID });
+
+            modelBuilder.Entity<QuizResult>()
+                .HasKey(q => q.QuizResultID);
+
+            modelBuilder.Entity<QuizResult>()
+                .HasOne(q => q.User)
+                .WithMany()
+                .HasForeignKey(q => q.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuizResult>()
+                .HasOne(q => q.SuggestedSeason)
+                .WithMany()
+                .HasForeignKey(q => q.SuggestedSeasonID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ================= ADMIN SEED =================
 

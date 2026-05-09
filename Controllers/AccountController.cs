@@ -30,13 +30,13 @@ namespace JapanApp.Controllers
 
             if (user == null)
             {
-                ViewBag.Error = "Sai tài khoản hoặc mật khẩu";
+                ViewBag.LoginError = "Sai tài khoản hoặc mật khẩu";
                 return View();
             }
 
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("Role", user.Role);
-            HttpContext.Session.SetInt32("UserID", user.UserID);
+            HttpContext.Session.SetString("UserID", user.UserID.ToString());
 
             if (user.Role == "Admin")
             {
@@ -50,7 +50,7 @@ namespace JapanApp.Controllers
 
         public IActionResult Register()
         {
-            return View();
+            return RedirectToAction("Login", new { showRegister = true });
         }
 
         [HttpPost]
@@ -61,8 +61,9 @@ namespace JapanApp.Controllers
 
             if (checkUser != null)
             {
-                ViewBag.Error = "Tài khoản đã tồn tại";
-                return View();
+                ViewBag.RegisterError = "Tài khoản đã tồn tại";
+                ViewBag.ShowRegister = true;
+                return View("Login");
             }
 
             model.Role = "User";

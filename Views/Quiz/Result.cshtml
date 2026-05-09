@@ -1,0 +1,650 @@
+@model List<JapanApp.Models.Festival>
+
+@{
+    ViewData["Title"] = "Kết quả Phân tích";
+}
+
+<div class="smart-result-page">
+    <div class="bg-glow shape-1"></div>
+    <div class="bg-glow shape-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="container relative-z">
+        <div class="result-hero fade-in-up">
+            <div class="success-icon-wrapper">
+                <div class="icon-pulse"></div>
+                <div class="success-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="badge-smart mb-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Phân tích hoàn tất
+            </div>
+
+            <h1 class="result-title">Kết Quả Phù Hợp Nhất</h1>
+
+            <div class="score-glass-panel">
+                <div class="score-label">Độ phù hợp</div>
+
+                <div class="score-value">
+                    @(ViewBag.MatchPercent ?? 0)<span class="score-unit">%</span>
+                </div>
+
+                <div class="match-bar">
+                    <div class="match-fill" style="width:@(ViewBag.MatchPercent ?? 0)%"></div>
+                </div>
+
+                <div class="score-note">
+                    Tổng điểm nội bộ: @(ViewBag.TotalScore ?? 0) điểm
+                    @if (ViewBag.SuggestedSeason != null)
+                    {
+                        <span> · Mùa gợi ý: @ViewBag.SuggestedSeason</span>
+                    }
+                </div>
+            </div>
+
+            @if (ViewBag.AIResult != null)
+            {
+                <div class="score-glass-panel ai-panel">
+                    <div class="score-label">AI phân tích</div>
+                    <p class="ai-text">@ViewBag.AIResult</p>
+                </div>
+            }
+
+            <p class="result-desc">
+                Hệ thống AI đã tổng hợp và chọn lọc những sự kiện văn hóa Nhật Bản phù hợp với sở thích của bạn.
+            </p>
+        </div>
+
+        <div class="row g-4 mt-2 mb-5">
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col-lg-4 col-md-6 fade-in-up" style="animation-delay: 0.2s;">
+                        <div class="smart-festival-card hover-glow">
+                            <div class="card-img-wrapper">
+                                <span class="location-badge">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                         stroke="currentColor" stroke-width="2">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    @item.LocationName
+                                </span>
+
+                                <img src="@Url.Content("~/images/" + GetImageName(item.Name))"
+                                     onerror="this.src='@Url.Content("~/images/default.jpg")';"
+                                     alt="@item.Name" />
+
+                                <div class="img-overlay"></div>
+                            </div>
+
+                            <div class="card-content glass-effect">
+                                <h3>@item.Name</h3>
+                                <p class="line-clamp-2">@item.Content</p>
+
+                                <div class="meta-tags mb-4">
+                                    <span class="tag">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        @item.StartDate.ToString("dd/MM") - @item.EndDate.ToString("dd/MM/yyyy")
+                                    </span>
+
+                                    @if (item.Season != null)
+                                    {
+                                        <span class="tag tag-highlight">
+                                            @GetSeasonIcon(item.Season.SeasonName) @item.Season.SeasonName
+                                        </span>
+                                    }
+                                </div>
+
+                                <a href="/Festival/Details/@item.FestivalID" class="btn-smart btn-explore w-100">
+                                    Chi tiết lễ hội
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                         stroke="currentColor" stroke-width="2" class="ms-2">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5 fade-in-up">
+                    <div class="empty-state glass-panel">
+                        <div class="empty-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="none"
+                                 stroke="rgba(255,255,255,0.2)" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </div>
+                        <h3>Chưa tìm thấy dữ liệu phù hợp</h3>
+                        <p>Hãy thử trả lời lại các câu hỏi với những lựa chọn khác để AI có thể gợi ý tốt hơn.</p>
+                        <a href="/Quiz" class="btn-smart btn-submit mt-3">Làm Lại Trắc Nghiệm</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="text-center pb-5 fade-in-up" style="animation-delay: 0.4s;">
+                <a href="/Quiz" class="btn-smart btn-back me-3">
+                    Làm lại bài trắc nghiệm
+                </a>
+                <a href="/Festival" class="btn-smart btn-submit">
+                    Xem tất cả lễ hội
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #E60012;
+        --primary-light: #ff1a2e;
+        --dark: #0f1115;
+        --dark-card: #1a1d24;
+        --text-main: #f8f9fc;
+        --text-muted: #8d93a5;
+        --border-color: rgba(255,255,255,0.08);
+        --accent: #FFD700;
+    }
+
+    body {
+        background-color: var(--dark);
+        color: var(--text-main);
+    }
+
+    .smart-result-page {
+        min-height: 100vh;
+        margin: -30px;
+        position: relative;
+        overflow: hidden;
+        font-family: 'Inter', 'Poppins', sans-serif;
+        padding: 80px 0;
+        background: #0a0a0f;
+    }
+
+    .relative-z {
+        position: relative;
+        z-index: 10;
+    }
+
+    .bg-grid {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        z-index: 0;
+    }
+
+    .bg-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.15;
+        z-index: 0;
+        animation: float 10s infinite alternate;
+    }
+
+    .shape-1 {
+        background: var(--primary);
+        width: 500px;
+        height: 500px;
+        top: -100px;
+        right: -100px;
+    }
+
+    .shape-2 {
+        background: #4a00e0;
+        width: 400px;
+        height: 400px;
+        bottom: 20%;
+        left: -100px;
+        animation-delay: -5s;
+    }
+
+    @@keyframes float {
+        0% {
+            transform: translate(0, 0);
+        }
+
+        100% {
+            transform: translate(30px, 50px);
+        }
+    }
+
+    .result-hero {
+        text-align: center;
+        max-width: 760px;
+        margin: 0 auto 50px;
+    }
+
+    .success-icon-wrapper {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-pulse {
+        position: absolute;
+        inset: 0;
+        background: rgba(74, 222, 128, 0.2);
+        border-radius: 50%;
+        animation: pulseIcon 2s infinite;
+    }
+
+    .success-icon {
+        position: relative;
+        z-index: 2;
+        color: #4ade80;
+        background: rgba(10,10,15,0.8);
+        border-radius: 50%;
+        padding: 15px;
+        border: 2px solid #4ade80;
+        box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+    }
+
+    @@keyframes pulseIcon {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    .badge-smart {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: var(--text-muted);
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .result-title {
+        font-size: 40px;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+
+    .result-desc {
+        font-size: 16px;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .score-glass-panel {
+        display: inline-block;
+        background: rgba(230,0,18,0.1);
+        border: 1px solid rgba(230,0,18,0.3);
+        backdrop-filter: blur(10px);
+        padding: 18px 32px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(230,0,18,0.15);
+    }
+
+    .score-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary-light);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .score-value {
+        font-size: 42px;
+        font-weight: 900;
+        color: white;
+        line-height: 1;
+    }
+
+    .score-unit {
+        font-size: 20px;
+        color: rgba(255,255,255,0.5);
+        font-weight: 600;
+        margin-left: 5px;
+    }
+
+    .score-note {
+        margin-top: 12px;
+        font-size: 13px;
+        color: rgba(255,255,255,0.6);
+    }
+
+    .match-bar {
+        width: 100%;
+        max-width: 320px;
+        height: 10px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 15px auto 0;
+    }
+
+    .match-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #ff1a2e, #FFD700);
+        box-shadow: 0 0 20px rgba(255,215,0,0.5);
+    }
+
+    .ai-panel {
+        display: block;
+        max-width: 800px;
+        margin: 25px auto;
+        text-align: left;
+    }
+
+    .ai-text {
+        color: white;
+        line-height: 1.8;
+        font-size: 15px;
+        margin: 0;
+    }
+
+    .smart-festival-card {
+        background: var(--dark-card);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .hover-glow:hover {
+        transform: translateY(-8px);
+        border-color: rgba(230,0,18,0.3);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(230,0,18,0.15);
+    }
+
+    .card-img-wrapper {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+    }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s;
+        }
+
+    .hover-glow:hover .card-img-wrapper img {
+        transform: scale(1.08);
+    }
+
+    .img-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, var(--dark-card), transparent);
+        opacity: 0.8;
+    }
+
+    .location-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(10,10,15,0.7);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .card-content {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
+        margin-top: -30px;
+    }
+
+        .card-content h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        color: var(--text-muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    .meta-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tag {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.05);
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #ccc;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .tag-highlight {
+        background: rgba(230,0,18,0.1);
+        border-color: rgba(230,0,18,0.2);
+        color: var(--primary-light);
+        font-weight: 600;
+    }
+
+    .btn-smart {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        border: none;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-explore {
+        background: rgba(255,255,255,0.05);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .hover-glow:hover .btn-explore {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .btn-submit {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 0 20px rgba(230,0,18,0.4);
+    }
+
+        .btn-submit:hover {
+            background: var(--primary-light);
+            box-shadow: 0 0 30px rgba(230,0,18,0.6);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+    .btn-back {
+        background: transparent;
+        color: var(--text-muted);
+        padding: 12px;
+    }
+
+        .btn-back:hover {
+            color: white;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+    }
+
+    .glass-panel {
+        background: rgba(26, 29, 36, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+    }
+
+    .empty-icon {
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        color: white;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @@keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .result-title {
+            font-size: 32px;
+        }
+
+        .btn-smart {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-back.me-3 {
+            margin-right: 0 !important;
+        }
+    }
+</style>
+
+@functions {
+    public string GetImageName(string name)
+    {
+        name = (name ?? "").ToLower();
+
+        if (name.Contains("hanami")) return "tokyo-hanami.jpg";
+        if (name.Contains("sumida")) return "tokyo-sumida.jpg";
+        if (name.Contains("kanda")) return "tokyo-kanda.jpg";
+        if (name.Contains("asakusa")) return "tokyo-asakusa.jpg";
+        if (name.Contains("gion")) return "kyoto-gion.jpg";
+        if (name.Contains("aoi")) return "kyoto-aoi1.jpg";
+        if (name.Contains("jidai")) return "kyoto-jidai.jpg";
+        if (name.Contains("tenjin")) return "osaka-tenjin.jpg";
+        if (name.Contains("sumiyoshi")) return "osaka-sumiyoshi.jpg";
+        if (name.Contains("snow")) return "sapporo-snow.jpg";
+        if (name.Contains("yosakoi")) return "sapporo-yosakoi.jpg";
+        if (name.Contains("hakata")) return "fukuoka-hakata.jpg";
+        if (name.Contains("lantern")) return "nagasaki-lantern.jpg";
+        if (name.Contains("takayama")) return "takayama.jpg";
+        if (name.Contains("fuji")) return "fuji.jpg";
+        if (name.Contains("akita")) return "akita.jpg";
+        if (name.Contains("nebuta")) return "nebuta.jpg";
+        if (name.Contains("sendai")) return "sendai.jpg";
+        if (name.Contains("okinawa")) return "okinawa.jpg";
+        if (name.Contains("kumamoto")) return "kumamoto.jpg";
+        if (name.Contains("nagoya")) return "nagoya.jpg";
+        if (name.Contains("kanazawa")) return "kanazawa.jpg";
+        if (name.Contains("kobe")) return "kobe.jpg";
+        if (name.Contains("nara")) return "nara.jpg";
+        if (name.Contains("chichibu")) return "chichibu.jpg";
+        if (name.Contains("kawagoe")) return "kawagoe.jpg";
+
+        return "default.jpg";
+    }
+
+    public string GetSeasonIcon(string seasonName)
+    {
+        if (string.IsNullOrEmpty(seasonName)) return "✨";
+        if (seasonName.ToLower().Contains("xuân")) return "🌸";
+        if (seasonName.ToLower().Contains("hạ")) return "🎐";
+        if (seasonName.ToLower().Contains("thu")) return "🍁";
+        if (seasonName.ToLower().Contains("đông")) return "❄️";
+
+        return "✨";
+    }
+}
